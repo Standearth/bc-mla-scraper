@@ -1,0 +1,23 @@
+# Build and Distribution artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+.env/
+
+# IDEs and Editors
+.vscode/
+.idea/
+
+# macOS system files
+.DS_Store
