@@ -7,7 +7,7 @@ A Python module and command-line tool to retrieve, format, and export active Mem
 You can install this package locally using `pip`. Navigate to the directory containing `pyproject.toml` and run:
 
 ```bash
-pip install .
+pip install -e .
 ```
 
 ## Usage
@@ -17,10 +17,8 @@ pip install .
 Once installed, you can run the scraper directly from your terminal. By default, running the script will fetch the data and save it as both `bc_mlas.csv` and `bc_mlas.json` in your current directory:
 
 ```bash
-python bc_mla_scraper.py
+bc-mla-scraper
 ```
-
-_(Or use `bc-mla-scraper` if you configured the entry point in your environment)._
 
 ### As a Python Module
 

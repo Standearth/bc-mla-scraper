@@ -186,8 +186,7 @@ class MLAScraper:
             return json.dumps(mlas, indent=4)
 
 
-if __name__ == "__main__":
-    # Example usage if the script is run directly
+def main():
     print("Initializing scraper...")
     scraper = MLAScraper()
 
@@ -201,3 +200,7 @@ if __name__ == "__main__":
     scraper.to_json(data, "bc_mlas.json")
 
     print("Data saved to bc_mlas.csv and bc_mlas.json")
+
+
+if __name__ == "__main__":
+    main()
