@@ -1,9 +1,13 @@
+import argparse
 import csv
 import io
 import json
 import urllib.parse
 
 import requests
+
+DEFAULT_CSV_FILE = "bc_mlas.csv"
+DEFAULT_JSON_FILE = "bc_mlas.json"
 
 
 class MLAScraper:
@@ -187,19 +191,49 @@ class MLAScraper:
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Scrape active MLA data from the British Columbia Legislature."
+    )
+
+    parser.add_argument(
+        "--csv",
+        nargs="?",
+        const=DEFAULT_CSV_FILE,
+        help=f"Export data to a CSV file. Optionally provide a custom filename (default: {DEFAULT_CSV_FILE}).",
+    )
+
+    parser.add_argument(
+        "--json",
+        nargs="?",
+        const=DEFAULT_JSON_FILE,
+        help=f"Export data to a JSON file. Optionally provide a custom filename (default: {DEFAULT_JSON_FILE}).",
+    )
+
+    args = parser.parse_args()
+
+    # If the user runs the command with zero arguments, default to outputting the CSV
+    if not args.csv and not args.json:
+        args.csv = DEFAULT_CSV_FILE
+
     print("Initializing scraper...")
     scraper = MLAScraper()
 
     print("Fetching active MLA data...")
-    data = scraper.fetch_all()
+    try:
+        data = scraper.fetch_all()
+        print(f"Retrieved {len(data)} records.")
+    except Exception as e:
+        print(f"Failed to fetch data: {e}")
+        return
 
-    print(f"Retrieved {len(data)} records.")
+    # Handle outputs
+    if args.csv:
+        scraper.to_csv(data, args.csv)
+        print(f"Data saved to CSV format -> {args.csv}")
 
-    # Write outputs to disk
-    scraper.to_csv(data, "bc_mlas.csv")
-    scraper.to_json(data, "bc_mlas.json")
-
-    print("Data saved to bc_mlas.csv and bc_mlas.json")
+    if args.json:
+        scraper.to_json(data, args.json)
+        print(f"Data saved to JSON format -> {args.json}")
 
 
 if __name__ == "__main__":

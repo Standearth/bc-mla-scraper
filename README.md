@@ -2,6 +2,8 @@
 
 A Python module and command-line tool to retrieve, format, and export active Member of Legislative Assembly (MLA) data from the British Columbia Legislature.
 
+**Author:** Matthew Carroll (stand.earth)
+
 ## Installation
 
 You can install this package locally using `pip`. Navigate to the directory containing `pyproject.toml` and run:
@@ -14,10 +16,25 @@ pip install -e .
 
 ### As a Command-Line Tool
 
-Once installed, you can run the scraper directly from your terminal. By default, running the script will fetch the data and save it as both `bc_mlas.csv` and `bc_mlas.json` in your current directory:
+Once installed, you can run the scraper directly from your terminal.
+
+By default, running the script without any arguments will fetch the data and save it to a `bc_mlas.csv` file in your current directory:
 
 ```bash
 bc-mla-scraper
+```
+
+You can specify the output format and optionally provide custom filenames using the `--csv` and `--json` flags:
+
+```bash
+# Generate both default CSV and JSON files
+bc-mla-scraper --csv --json
+
+# Generate only a JSON file
+bc-mla-scraper --json
+
+# Generate files with custom names
+bc-mla-scraper --csv my_custom_data.csv --json output_folder/my_data.json
 ```
 
 ### As a Python Module
