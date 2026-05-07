@@ -17,3 +17,12 @@ dependencies = [
 
 [project.scripts]
 bc-mla-scraper = "bc_mla_scraper:main"
+bc-mla-en = "engaging_networks:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0"
+]
+
+[tool.setuptools]
+py-modules = ["bc_mla_scraper", "engaging_networks", "formatters"]
