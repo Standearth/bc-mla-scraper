@@ -22,6 +22,10 @@ env/
 # macOS system files
 .DS_Store
 
-# Output files
+# Ignore output files
 *.csv
 *.json
+
+# Allow hosted data
+!docs/bc_mlas.csv
+!docs/bc_mlas.json

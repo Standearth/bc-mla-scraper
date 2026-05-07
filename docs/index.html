@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BC MLA Directory | Stand.earth</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🏛️ BC MLA Directory</h1>
+      <p>
+        Daily-updated data of the current Members of the Legislative Assembly
+        for British Columbia.
+      </p>
+
+      <p>
+        <em
+          >For automated access and use in other applications, see
+          <a
+            href="https://github.com/stand-earth/bc-mla-scraper"
+            target="_blank"
+            >GitHub</a
+          >.
+        </em>
+      </p>
+
+      <div class="controls">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-box"
+          placeholder="Search by constituency or name..."
+        />
+        <div class="btn-group">
+          <a href="bc_mlas.csv" class="btn">📄 Download CSV</a>
+          <a href="bc_mlas.json" class="btn btn-json">📦 Download JSON</a>
+        </div>
+      </div>
+
+      <div id="loading" class="loading">Fetching latest data...</div>
+
+      <div class="table-wrapper">
+        <table id="mlaTable" style="display: none">
+          <thead>
+            <tr>
+              <th data-sort="constituencyName" class="sortable">
+                Constituency <span class="sort-icon"></span>
+              </th>
+              <th>Photo</th>
+              <th data-sort="name" class="sortable">
+                Name <span class="sort-icon"></span>
+              </th>
+              <th data-sort="email" class="sortable">
+                Email <span class="sort-icon"></span>
+              </th>
+              <th data-sort="partyAbbreviation" class="sortable">
+                Party <span class="sort-icon"></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer">
+      Maintained by
+      <a href="https://stand.earth" target="_blank">Stand.earth</a> |
+      <a href="https://github.com/stand-earth/bc-mla-scraper" target="_blank"
+        >Source Code</a
+      >
+    </div>
+  </body>
+</html>
