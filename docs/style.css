@@ -316,11 +316,13 @@ th.sort-desc .sort-icon::after {
   letter-spacing: 0.02em;
 }
 
-.email-link {
+.email-link,
+.phone-link {
   color: #0066cc;
   text-decoration: none;
 }
-.email-link:hover {
+.email-link:hover,
+.phone-link:hover {
   text-decoration: underline;
 }
 
@@ -376,6 +378,9 @@ th.sort-desc .sort-icon::after {
 }
 .detail-card a:hover {
   text-decoration: underline;
+}
+.detail-card a.phone-link {
+  font-weight: normal;
 }
 
 .raw-table tr:hover {

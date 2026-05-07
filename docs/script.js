@@ -3,43 +3,11 @@ let currentSort = { column: "constituencyId", direction: "asc" };
 let isRawView = false;
 
 const PARTY_COLORS = {
-  CONSERVATIVE: "#004AAD",
+  Conservative: "#004AAD",
   NDP: "#F4A460",
-  GREEN: "#99C955",
-  INDEPENDENT: "#7f8c8d",
+  Green: "#99C955",
+  Independent: "#7f8c8d",
 };
-
-function getPartyInfo(mla) {
-  const name = (mla.partyName || "").toUpperCase();
-  const abbr = (mla.partyAbbreviation || "").toUpperCase();
-  const combined = `${name} ${abbr}`;
-
-  if (combined.includes("NDP") || combined.includes("NEW DEMOCRATIC PARTY"))
-    return { label: "NDP", color: PARTY_COLORS.NDP };
-  if (combined.includes("GREEN"))
-    return { label: "Green", color: PARTY_COLORS.GREEN };
-  if (combined.includes("CONSERVATIVE"))
-    return { label: "Conservative", color: PARTY_COLORS.CONSERVATIVE };
-  return { label: "Independent", color: PARTY_COLORS.INDEPENDENT };
-}
-
-function formatPhone(phoneStr) {
-  if (!phoneStr) return null;
-  try {
-    if (typeof libphonenumber !== "undefined") {
-      const parsed = libphonenumber.parsePhoneNumberFromString(
-        String(phoneStr),
-        "CA",
-      );
-      if (parsed && parsed.isValid()) {
-        return parsed.formatNational();
-      }
-    }
-  } catch (e) {
-    console.warn("Error formatting phone:", e);
-  }
-  return phoneStr;
-}
 
 async function init() {
   try {
@@ -58,7 +26,9 @@ function renderTable(items) {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = items
     .map((mla, index) => {
-      const party = getPartyInfo(mla);
+      const partyLabel = mla.partyAbbreviationClean || "Independent";
+      const partyColor =
+        PARTY_COLORS[partyLabel] || PARTY_COLORS["Independent"];
 
       const primaryEmailHtml = mla.email
         ? `<div><a href="mailto:${mla.email}" class="email-link" onclick="event.stopPropagation()">${mla.email}</a></div>`
@@ -77,20 +47,39 @@ function renderTable(items) {
         ? `<p><strong>Elected:</strong> ${mla.electionYears}</p>`
         : "";
 
-      const conAddress = mla.conOfficeAddress
-        ? `<p>${mla.conOfficeAddress}</p>`
-        : "";
+      // Constituency Office Layout
+      let conAddressHtml = "";
+      if (mla.conOfficeAddressCleanSuite && mla.conOfficeAddressCleanStreet) {
+        conAddressHtml += `<p>${mla.conOfficeAddressCleanSuite}-${mla.conOfficeAddressCleanStreet}</p>`;
+      } else if (mla.conOfficeAddressCleanStreet) {
+        conAddressHtml += `<p>${mla.conOfficeAddressCleanStreet}</p>`;
+      }
+      if (mla.conOfficeAddressCleanPOBox) {
+        conAddressHtml += `<p>${mla.conOfficeAddressCleanPOBox}</p>`;
+      }
+      if (!conAddressHtml && !mla.conOfficeCity) {
+        conAddressHtml = "<p>Address not listed</p>";
+      }
+
       const conCityProv = mla.conOfficeCity
         ? `<p>${mla.conOfficeCity}, BC</p>`
         : "";
       const conPostal = mla.conOfficePostalCode
         ? `<p>${mla.conOfficePostalCode}</p>`
         : "";
-      const conPhone = formatPhone(mla.conOfficePhone);
-      const conPhoneHtml = conPhone ? `<p>📞 ${conPhone}</p>` : "";
-      const conFax = formatPhone(mla.conOfficeFax);
-      const conFaxHtml = conFax ? `<p>📠 ${conFax}</p>` : "";
 
+      // ADDED TEL: LINKS HERE
+      const conPhoneHtml = mla.conOfficePhoneClean
+        ? `<p>📞 <a href="tel:${mla.conOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficePhoneClean}</a></p>`
+        : "";
+      const conTollFreeHtml = mla.conOfficeTollFreeClean
+        ? `<p>📞 <a href="tel:${mla.conOfficeTollFree}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficeTollFreeClean}</a></p>`
+        : "";
+      const conFaxHtml = mla.conOfficeFaxClean
+        ? `<p>📠 ${mla.conOfficeFaxClean}</p>`
+        : "";
+
+      // Legislature Office Layout
       const legAddress = mla.legBuildingAddress
         ? `<p>${mla.legBuildingAddress}</p>`
         : "";
@@ -100,10 +89,12 @@ function renderTable(items) {
       const legPostal = mla.legBuildingPostalCode
         ? `<p>${mla.legBuildingPostalCode}</p>`
         : "";
-      const legPhone = formatPhone(mla.legOfficePhone);
-      const legPhoneHtml = legPhone ? `<p>📞 ${legPhone}</p>` : "";
-      const legFax = formatPhone(mla.legOfficeFax);
-      const legFaxHtml = legFax ? `<p>📠 ${legFax}</p>` : "";
+      const legPhoneHtml = mla.legOfficePhoneClean
+        ? `<p>📞 <a href="tel:${mla.legOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.legOfficePhoneClean}</a></p>`
+        : "";
+      const legFaxHtml = mla.legOfficeFaxClean
+        ? `<p>📠 ${mla.legOfficeFaxClean}</p>`
+        : "";
 
       return `
           <tr class="expandable-row" id="row-${index}" onclick="toggleDetails(${index})">
@@ -118,8 +109,8 @@ function renderTable(items) {
               </td>
               <td>${combinedEmailHtml}</td>
               <td>
-                  <span class="party-tag" style="background-color: ${party.color};">
-                      ${party.label}
+                  <span class="party-tag" style="background-color: ${partyColor};">
+                      ${partyLabel}
                   </span>
               </td>
           </tr>
@@ -135,10 +126,11 @@ function renderTable(items) {
                       
                       <div class="detail-card">
                           <h4>Constituency Office</h4>
-                          ${conAddress || (conCityProv ? "" : "<p>Address not listed</p>")}
+                          ${conAddressHtml}
                           ${conCityProv}
                           ${conPostal}
                           ${conPhoneHtml}
+                          ${conTollFreeHtml}
                           ${conFaxHtml}
                       </div>
 
@@ -218,13 +210,10 @@ function renderRawTable(items) {
 function triggerSearch() {
   const term = document.getElementById("searchInput").value.toLowerCase();
 
-  const filtered = mlaData.filter(
-    (mla) =>
-      (mla.firstName || "").toLowerCase().includes(term) ||
-      (mla.lastName || "").toLowerCase().includes(term) ||
-      (mla.constituencyName || "").toLowerCase().includes(term) ||
-      (mla.roles || "").toLowerCase().includes(term) ||
-      (mla.email || "").toLowerCase().includes(term),
+  const filtered = mlaData.filter((mla) =>
+    Object.values(mla).some(
+      (val) => val && String(val).toLowerCase().includes(term),
+    ),
   );
 
   if (isRawView) renderRawTable(filtered);
@@ -257,8 +246,8 @@ function sortData(column, forceDirection = null) {
       valA = (a.lastName + a.firstName).toLowerCase();
       valB = (b.lastName + b.firstName).toLowerCase();
     } else if (column === "partyAbbreviation") {
-      valA = getPartyInfo(a).label;
-      valB = getPartyInfo(b).label;
+      valA = a.partyAbbreviationClean || "";
+      valB = b.partyAbbreviationClean || "";
     } else {
       valA = a[column];
       valB = b[column];

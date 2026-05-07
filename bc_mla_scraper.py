@@ -6,6 +6,8 @@ import urllib.parse
 
 import requests
 
+from formatters import clean_party_abbreviation, format_phone, parse_address
+
 DEFAULT_CSV_FILE = "bc_mlas.csv"
 DEFAULT_JSON_FILE = "bc_mlas.json"
 
@@ -189,6 +191,19 @@ class MLAScraper:
                 f"{self.IMAGE_BASE_URL}{raw_image_path}" if raw_image_path else ""
             )
 
+            # Get pre-processed data fields
+            is_honourable = node.get("isHonourable", False)
+            is_doctor = node.get("isDoctor", False)
+            is_counsel = node.get("isCounsel", False)
+
+            con_suite, con_street, con_po_box = parse_address(
+                (con_office.get("address") or "").strip(), con_office.get("city", "")
+            )
+
+            party_clean = clean_party_abbreviation(
+                party.get("name", ""), party.get("abbreviation", "")
+            )
+
             processed_mlas.append(
                 {
                     "constituencyId": node.get("constituencyId", ""),
@@ -197,31 +212,47 @@ class MLAScraper:
                     "firstName": first_name,
                     "lastName": last_name,
                     "email": member.get("legislativeEmail", ""),
-                    "ministryEmail": ministry_email,  # <--- NEW FIELD ADDED HERE
+                    "ministryEmail": ministry_email,
                     "partyName": party.get("name", ""),
                     "partyAbbreviation": party.get("abbreviation", ""),
+                    "partyAbbreviationClean": party_clean,
                     "roles": roles_str,
                     "electionYears": member.get("electionYears", ""),
-                    "isHonourable": node.get("isHonourable", False),
-                    "isDoctor": node.get("isDoctor", False),
-                    "isCounsel": node.get("isCounsel", False),
+                    "isHonourable": is_honourable,
+                    "isHonourableClean": "Hon." if is_honourable else "",
+                    "isDoctor": is_doctor,
+                    "isDoctorClean": "Dr." if is_doctor else "",
+                    "isCounsel": is_counsel,
+                    "isCounselClean": "K.C." if is_counsel else "",
                     "profileUrl": profile_url,
                     "imagePath": full_image_path,
                     "imageDescription": image.get("description", ""),
                     # Legislative Office Details
                     "legOfficeRoom": leg_office.get("name", ""),
                     "legOfficePhone": leg_office.get("phone", ""),
+                    "legOfficePhoneClean": format_phone(leg_office.get("phone", "")),
                     "legOfficeFax": leg_office.get("fax", ""),
+                    "legOfficeFaxClean": format_phone(leg_office.get("fax", "")),
                     "legBuildingAddress": leg_building.get("address", ""),
                     "legBuildingCity": leg_building.get("city", ""),
                     "legBuildingPostalCode": leg_building.get("postalcode", ""),
                     # Constituency Office Details
                     "conOfficeAddress": (con_office.get("address") or "").strip(),
+                    "conOfficeAddressCleanSuite": con_suite,
+                    "conOfficeAddressCleanStreet": con_street,
+                    "conOfficeAddressCleanPOBox": con_po_box,
                     "conOfficeCity": con_office.get("city", ""),
                     "conOfficePostalCode": con_office.get("postalcode", ""),
                     "conOfficePhone": con_office.get("phoneNumber", ""),
+                    "conOfficePhoneClean": format_phone(
+                        con_office.get("phoneNumber", "")
+                    ),
                     "conOfficeFax": con_office.get("fax", ""),
+                    "conOfficeFaxClean": format_phone(con_office.get("fax", "")),
                     "conOfficeTollFree": con_office.get("tollFreePhone", ""),
+                    "conOfficeTollFreeClean": format_phone(
+                        con_office.get("tollFreePhone", "")
+                    ),
                     "conOfficeEmail": con_office.get("email", ""),
                 }
             )

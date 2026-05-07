@@ -36,7 +36,6 @@ import csv
 from datetime import datetime
 
 from bc_mla_scraper import MLAScraper
-from formatters import format_phone, parse_address
 
 
 def process_for_engaging_networks(mlas):
@@ -46,48 +45,42 @@ def process_for_engaging_networks(mlas):
     en_rows = []
 
     for mla in mlas:
-        # Determine Title
-        title = "Dr." if mla.get("isDoctor") else mla.get("prefix", "")
+        # Determine Title (Fallback to prefix)
+        title = mla.get("isDoctorClean") or mla.get("prefix", "")
 
-        # Parse Address (pass the city to help resolve messy PO Boxes)
-        suite, street = parse_address(
-            mla.get("conOfficeAddress", ""), mla.get("conOfficeCity", "")
-        )
+        # Recombine the street and PO Box
+        street = mla.get("conOfficeAddressCleanStreet", "")
+        po_box = mla.get("conOfficeAddressCleanPOBox", "")
+        combined_street = street
+        if po_box:
+            combined_street = f"{street}, {po_box}" if street else po_box
 
         # Determine Primary Phone (Prefer Toll-Free)
-        phone = mla.get("conOfficeTollFree")
+        phone = mla.get("conOfficeTollFreeClean")
         if not phone:
-            phone = mla.get("conOfficePhone")
-        formatted_phone = format_phone(phone)
-
-        # Format Legislative Phone for Bio 5
-        leg_phone = format_phone(mla.get("legOfficePhone"))
-
-        # Set Special Titles
-        bio1 = "Hon." if mla.get("isHonourable") else ""
-        bio2 = "K.C." if mla.get("isCounsel") else ""
+            phone = mla.get("conOfficePhoneClean")
 
         # Construct the final row mapping
         row = {
             "First Name": mla.get("firstName", ""),
             "Last Name": mla.get("lastName", ""),
             "Email Address": mla.get("email", ""),
-            "Street Address": street,
-            "Suite": suite,
+            "Street Address": combined_street,
+            "Suite": mla.get("conOfficeAddressCleanSuite", ""),
             "City": mla.get("conOfficeCity", ""),
             "Province": "BC",
             "Country": "Canada",
-            "Phone Number": formatted_phone,
+            "Phone Number": phone,
             "Title": title,
             "Organization": mla.get("constituencyName", ""),
             "Constituency": str(mla.get("constituencyId", "")),
-            "Biography 1": bio1,
-            "Biography 2": bio2,
+            "Biography 1": mla.get("isHonourableClean", ""),
+            "Biography 2": mla.get("isCounselClean", ""),
             "X Handle": mla.get("ministryEmail", ""),
             "Biography 4": mla.get("roles", ""),
-            "Biography 5": leg_phone,
+            "Biography 5": mla.get("legOfficePhoneClean", ""),
             "Biography 6": mla.get("conOfficePostalCode", ""),
-            "Biography 7": mla.get("profileUrl", ""),  # Now holds the profile URL
+            "Biography 7": mla.get("profileUrl", ""),
             "Party": mla.get("partyName", ""),
         }
         en_rows.append(row)
