@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BC MLA Directory | Stand.earth</title>
     <link rel="stylesheet" href="style.css" />
+
+    <script
+      src="https://unpkg.com/libphonenumber-js@1.10.49/bundle/libphonenumber-js.min.js"
+      defer
+    ></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -15,23 +20,12 @@
         for British Columbia.
       </p>
 
-      <p>
-        <em
-          >For automated access and use in other applications, see
-          <a
-            href="https://github.com/stand-earth/bc-mla-scraper"
-            target="_blank"
-            >GitHub</a
-          >.
-        </em>
-      </p>
-
       <div class="controls">
         <input
           type="text"
           id="searchInput"
           class="search-box"
-          placeholder="Search by constituency or name..."
+          placeholder="Search by constituency, name, or role..."
         />
         <div class="btn-group">
           <a href="bc_mlas.csv" class="btn">📄 Download CSV</a>
@@ -41,36 +35,63 @@
 
       <div id="loading" class="loading">Fetching latest data...</div>
 
-      <div class="table-wrapper">
-        <table id="mlaTable" style="display: none">
-          <thead>
-            <tr>
-              <th data-sort="constituencyName" class="sortable">
-                Constituency <span class="sort-icon"></span>
-              </th>
-              <th>Photo</th>
-              <th data-sort="name" class="sortable">
-                Name <span class="sort-icon"></span>
-              </th>
-              <th data-sort="email" class="sortable">
-                Email <span class="sort-icon"></span>
-              </th>
-              <th data-sort="partyAbbreviation" class="sortable">
-                Party <span class="sort-icon"></span>
-              </th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <div id="tableArea" style="display: none">
+        <div class="table-actions">
+          <button id="btnExpandAll" onclick="expandAll()" class="btn-small">
+            Expand All
+          </button>
+          <button
+            id="btnCollapseAll"
+            onclick="collapseAll()"
+            class="btn-small"
+            disabled
+          >
+            Collapse All
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table id="mlaTable">
+            <thead>
+              <tr>
+                <th data-sort="constituencyName" class="sortable">
+                  Constituency <span class="sort-icon"></span>
+                </th>
+                <th>Photo</th>
+                <th data-sort="name" class="sortable">
+                  Name <span class="sort-icon"></span>
+                </th>
+                <th data-sort="email" class="sortable">
+                  Email <span class="sort-icon"></span>
+                </th>
+                <th data-sort="partyAbbreviation" class="sortable">
+                  Party <span class="sort-icon"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <div class="footer">
-      Maintained by
-      <a href="https://stand.earth" target="_blank">Stand.earth</a> |
-      <a href="https://github.com/stand-earth/bc-mla-scraper" target="_blank"
-        >Source Code</a
-      >
+      <p>
+        Maintained by
+        <a href="https://stand.earth" target="_blank">Stand.earth</a> |
+        <a href="https://github.com/standearth/bc-mla-scraper" target="_blank"
+          >Source Code</a
+        >
+      </p>
+      <p>
+        Developers: Feel free to hotlink the
+        <a href="/bc_mlas.csv">csv</a> or <a href="/bc_mlas.json">json</a> files
+        or use the
+        <a href="https://github.com/standearth/bc-mla-scraper" target="_blank"
+          >scraper</a
+        >
+        directly in your own project.
+      </p>
     </div>
   </body>
 </html>
