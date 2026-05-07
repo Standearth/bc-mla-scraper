@@ -61,7 +61,7 @@ function renderTable(items) {
       const party = getPartyInfo(mla);
 
       const emailHtml = mla.email
-        ? `<a href="mailto:${mla.email}" class="email-link">${mla.email}</a>`
+        ? `<a href="mailto:${mla.email}" class="email-link" onclick="event.stopPropagation()">${mla.email}</a>`
         : ``;
 
       const rolesHtml = mla.roles
@@ -102,8 +102,7 @@ function renderTable(items) {
       return `
           <tr class="expandable-row" id="row-${index}" onclick="toggleDetails(${index})">
               <td style="font-weight: 500;">
-                  <span class="chevron" id="chevron-${index}">▼</span> 
-                  &nbsp;${mla.constituencyName}
+                  <span class="chevron" id="chevron-${index}">▼</span> ${mla.constituencyName}
               </td>
               <td><img src="${mla.imagePath}" class="headshot" alt="${mla.firstName}"></td>
               <td>
@@ -111,7 +110,7 @@ function renderTable(items) {
                       ${mla.firstName} ${mla.lastName}
                   </a>
               </td>
-              <td onclick="event.stopPropagation()">${emailHtml}</td>
+              <td>${emailHtml}</td>
               <td>
                   <span class="party-tag" style="background-color: ${party.color};">
                       ${party.label}
@@ -293,10 +292,6 @@ function expandAll() {
   document
     .querySelectorAll(".expandable-row")
     .forEach((row) => row.classList.add("expanded-row"));
-
-  document
-    .querySelectorAll(".chevron")
-    .forEach((chevron) => (chevron.innerText = "▲"));
   updateToggleButtons();
 }
 
@@ -307,10 +302,6 @@ function collapseAll() {
   document
     .querySelectorAll(".expandable-row")
     .forEach((row) => row.classList.remove("expanded-row"));
-
-  document
-    .querySelectorAll(".chevron")
-    .forEach((chevron) => (chevron.innerText = "▼"));
   updateToggleButtons();
 }
 
@@ -322,11 +313,9 @@ function toggleDetails(index) {
   if (detailsRow.style.display === "none") {
     detailsRow.style.display = "table-row";
     mainRow.classList.add("expanded-row");
-    if (chevron) chevron.innerText = "▲";
   } else {
     detailsRow.style.display = "none";
     mainRow.classList.remove("expanded-row");
-    if (chevron) chevron.innerText = "▼";
   }
   updateToggleButtons();
 }

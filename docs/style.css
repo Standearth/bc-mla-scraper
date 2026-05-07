@@ -282,6 +282,13 @@ th.sortable:hover {
   font-size: 0.85rem;
   color: #7f8c8d;
   text-align: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.footer p:last-child {
+  font-size: 0.8rem;
+  opacity: 0.85;
 }
 
 /* Restored Missing Table Interaction Styles */
@@ -326,6 +333,7 @@ th.sort-desc .sort-icon::after {
   font-size: 0.8rem;
   transition: transform 0.3s;
   display: inline-block;
+  margin-right: 8px;
 }
 .expanded-row {
   background-color: #eef2f6 !important;
@@ -376,4 +384,205 @@ th.sort-desc .sort-icon::after {
 
 .table-actions #viewToggle {
   margin-left: auto;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE STYLES (Max Width 768px)
+   ========================================= */
+@media (max-width: 768px) {
+  /* Helper class to hide text exclusively on mobile screens */
+  .hide-on-mobile {
+    display: none;
+  }
+
+  /* 1. Global & Header Adjustments */
+  body {
+    width: 100%;
+    padding: 0;
+  }
+  .container {
+    padding: 1rem;
+    border-radius: 0;
+  }
+  .controls {
+    display: flex; /* Ensure flex is active */
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #downloadButtons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    order: 1;
+    margin-bottom: 0.5rem;
+  }
+  #downloadButtons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .controls .search-box {
+    max-width: 100%;
+    order: 2;
+    margin-bottom: 0;
+  }
+  .table-actions {
+    flex-wrap: wrap;
+  }
+
+  /* 2. DIRECTORY VIEW: Convert Table to Card Layout */
+  .table-wrapper {
+    border: none;
+  }
+  #mlaTable thead {
+    display: none; /* Hide column headers on mobile */
+  }
+  #mlaTable,
+  #mlaTable tbody,
+  #mlaTable tr.expandable-row {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Transform standard table row into a CSS Grid Card */
+  #mlaTable tr.expandable-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 4px 12px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    position: relative;
+  }
+  #mlaTable tr.expandable-row td {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  /* Photo (Col 2) */
+  #mlaTable tr.expandable-row td:nth-child(2) {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    align-self: start;
+  }
+  #mlaTable tr.expandable-row td:nth-child(2) img {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* District Name (Col 1) - Now Header */
+  #mlaTable tr.expandable-row td:nth-child(1) {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 1.1rem;
+    font-weight: 700 !important; /* Overrides the inline style */
+    color: #1e293b;
+    align-self: center;
+    padding-right: 24px; /* Prevents text from overlapping the absolute chevron */
+  }
+
+  /* MLA Name (Col 3) */
+  #mlaTable tr.expandable-row td:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 1rem;
+    align-self: center;
+  }
+
+  /* Email (Col 4) */
+  #mlaTable tr.expandable-row td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 3;
+    font-size: 0.85rem;
+    word-break: break-all;
+    align-self: center;
+  }
+
+  /* Party (Col 5) */
+  #mlaTable tr.expandable-row td:nth-child(5) {
+    grid-column: 2;
+    grid-row: 4;
+    align-self: center;
+    padding-top: 4px; /* Optional: adds a tiny bit of breathing room above the badge */
+  }
+
+  /* Move the chevron arrow to the top right of the card */
+  #mlaTable tr.expandable-row td:nth-child(1) .chevron {
+    position: absolute;
+    top: 1.25rem;
+    right: 1rem;
+    font-size: 1.2rem;
+    margin-right: 0; /* Resets the desktop margin added earlier */
+  }
+
+  /* 3. Details Row (Expanded View) */
+  #mlaTable tr.expandable-row.expanded-row {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+  }
+  /* Overrides JS inline "table-row" style using adjacent sibling selector */
+  #mlaTable tr.expandable-row.expanded-row + tr.details-row {
+    display: block !important;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  #mlaTable tr.details-row td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: none; /* Removes the thick bottom line from desktop */
+  }
+  .details-content {
+    grid-template-columns: 1fr; /* Stack the detail blocks */
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  /* 4. RAW VIEW MODE Adjustments */
+  body.raw-mode .header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  body.raw-mode .header-actions {
+    display: flex; /* Ensure flex layout applies */
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 8px;
+  }
+  body.raw-mode #downloadButtons {
+    order: 1; /* Puts download buttons first */
+    flex-direction: row;
+    flex: 1.2;
+    width: auto;
+    margin-bottom: 0; /* Clears the margin we added in directory view */
+  }
+  body.raw-mode #downloadButtons .btn {
+    flex: 1;
+    padding: 4px 8px;
+  }
+  body.raw-mode #viewToggle {
+    order: 2; /* Puts View Directory button next to the download buttons */
+    flex: 1;
+    width: auto;
+    justify-content: center;
+    margin-top: 0;
+    padding: 4px 8px;
+  }
+  body.raw-mode .search-box {
+    width: 100%;
+    order: 3; /* Forces search bar to drop below all the buttons */
+  }
+  body.raw-mode .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
