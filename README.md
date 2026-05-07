@@ -64,16 +64,43 @@ json_string = scraper.to_json(mla_data)
 
 The scraper standardizes and exports the following fields for each MLA:
 
+**Electoral District Details:**
+
 - `constituencyId`: The ID of the electoral district.
 - `constituencyName`: The name of the electoral district.
+
+**MLA Details:**
+
 - `prefix`: The member's prefix (e.g., Mr., Ms., Hon.).
 - `firstName`: The member's first name.
 - `lastName`: The member's last name.
+- `email`: The member's primary legislative email address.
 - `partyName`: The full name of the member's political party.
-- `partyAbbreviation`: The abbreviated party name.
+- `partyAbbreviation`: The abbreviated party name (not actually abbreviated most of the time, but it's what the legislature site provides.)
+- `roles`: A string containing the member's active roles or ministries (separated by `|`).
+- `electionYears`: A string listing the years the member was elected.
 - `isHonourable`: Boolean indicating if the member holds the "Honourable" title.
 - `isDoctor`: Boolean indicating if the member is a doctor.
 - `isCounsel`: Boolean indicating if the member is Queen's/King's Counsel.
 - `profileUrl`: The dynamically generated, absolute URL to the member's official profile page.
 - `imagePath`: The absolute URL to the member's official headshot image.
 - `imageDescription`: The alt-text description for the headshot.
+
+**Legislative Office Details:**
+
+- `legOfficeRoom`: The room number or name of their legislative office.
+- `legOfficePhone`: The phone number for their legislative office.
+- `legOfficeFax`: The fax number for their legislative office.
+- `legBuildingAddress`: The street address of the legislative building.
+- `legBuildingCity`: The city of the legislative building (e.g., Victoria).
+- `legBuildingPostalCode`: The postal code of the legislative building.
+
+**Constituency Office Details:**
+
+- `conOfficeAddress`: The street address of their primary constituency office.
+- `conOfficeCity`: The city of their constituency office.
+- `conOfficePostalCode`: The postal code of their constituency office.
+- `conOfficePhone`: The local phone number for their constituency office.
+- `conOfficeFax`: The fax number for their constituency office.
+- `conOfficeTollFree`: The toll-free phone number for their constituency office.
+- `conOfficeEmail`: The general contact email for the constituency office.
