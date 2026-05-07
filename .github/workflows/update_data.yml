@@ -41,7 +41,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # Add the generated data files
-          git add bc_mlas.csv bc_mlas.json
+          git add docs/bc_mlas.csv docs/bc_mlas.json
 
           # Commit the files (if there are changes) and push
           git commit -m "Automated update of BC MLA data" || exit 0
