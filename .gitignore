@@ -15,16 +15,12 @@ env/
 .venv/
 .env/
 
-# IDEs and Editors
-.vscode/
-.idea/
-
 # macOS system files
 .DS_Store
 
 # Ignore output files
-*.csv
-*.json
+/*.csv
+/*.json
 
 # Allow hosted data
 !docs/bc_mlas.csv
