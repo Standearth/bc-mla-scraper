@@ -1,5 +1,6 @@
 let mlaData = [];
-let currentSort = { column: "constituencyName", direction: "asc" };
+let currentSort = { column: "constituencyId", direction: "asc" };
+let isRawView = false;
 
 const PARTY_COLORS = {
   CONSERVATIVE: "#004AAD",
@@ -46,11 +47,10 @@ async function init() {
     mlaData = await response.json();
     document.getElementById("loading").style.display = "none";
     document.getElementById("tableArea").style.display = "block";
-    sortData("constituencyName", "asc");
+    sortData("constituencyId", "asc");
   } catch (error) {
-    document.getElementById("loading").innerText =
-      "Error loading data. Please try again later.";
-    console.error("Fetch error:", error);
+    document.getElementById("loading").innerText = "Error loading data.";
+    console.error(error);
   }
 }
 
@@ -118,7 +118,6 @@ function renderTable(items) {
                   </span>
               </td>
           </tr>
-
           <tr id="details-${index}" class="details-row" style="display: none;">
               <td colspan="5">
                   <div class="details-content">
@@ -152,70 +151,86 @@ function renderTable(items) {
       `;
     })
     .join("");
-
-  // Update buttons immediately after building the table
   updateToggleButtons();
 }
 
-// --- Toggle Logic ---
-function toggleDetails(index) {
-  const detailsRow = document.getElementById(`details-${index}`);
-  const mainRow = document.getElementById(`row-${index}`);
+function toggleViewMode() {
+  isRawView = !isRawView;
+  const btn = document.getElementById("viewToggle");
+  const searchInput = document.getElementById("searchInput");
+  const downloadButtons = document.getElementById("downloadButtons");
+  const headerActions = document.getElementById("headerActions");
+  const controls = document.getElementById("controls");
+  const actionButtons = document.getElementById("actionButtons");
 
-  if (detailsRow.style.display === "none") {
-    detailsRow.style.display = "table-row";
-    mainRow.classList.add("expanded-row");
+  if (isRawView) {
+    btn.innerHTML = "🏛️ View Directory";
+    document.body.classList.add("raw-mode");
+    document.getElementById("directoryWrapper").style.display = "none";
+    document.getElementById("rawWrapper").style.display = "block";
+    document.getElementById("intro").style.display = "none";
+    document.getElementById("mainFooter").style.display = "none";
+    document.getElementById("btnExpandAll").style.display = "none";
+    document.getElementById("btnCollapseAll").style.display = "none";
+    headerActions.appendChild(searchInput);
+    headerActions.appendChild(downloadButtons);
+    headerActions.appendChild(btn);
   } else {
-    detailsRow.style.display = "none";
-    mainRow.classList.remove("expanded-row");
+    btn.innerHTML = "🗄️ View Raw Data";
+    document.body.classList.remove("raw-mode");
+    document.getElementById("directoryWrapper").style.display = "block";
+    document.getElementById("rawWrapper").style.display = "none";
+    document.getElementById("intro").style.display = "block";
+    document.getElementById("mainFooter").style.display = "block";
+    document.getElementById("btnExpandAll").style.display = "inline-flex";
+    document.getElementById("btnCollapseAll").style.display = "inline-flex";
+    controls.prepend(searchInput);
+    controls.appendChild(downloadButtons);
+    actionButtons.appendChild(btn);
   }
-
-  updateToggleButtons();
+  triggerSearch();
 }
 
-function expandAll() {
-  document
-    .querySelectorAll(".details-row")
-    .forEach((row) => (row.style.display = "table-row"));
-  document
-    .querySelectorAll(".expandable-row")
-    .forEach((row) => row.classList.add("expanded-row"));
-  updateToggleButtons();
+function renderRawTable(items) {
+  const thead = document.getElementById("rawTableHead");
+  const tbody = document.getElementById("rawTableBody");
+  if (!items.length) {
+    tbody.innerHTML = "<tr><td>No results found</td></tr>";
+    return;
+  }
+  const keys = Object.keys(items[0]);
+
+  thead.innerHTML = `<tr>${keys.map((k) => `<th class="sortable" onclick="sortData('${k}')" data-sort="${k}">${k} <span class="sort-icon"></span></th>`).join("")}</tr>`;
+
+  tbody.innerHTML = items
+    .map(
+      (item) =>
+        `<tr>${keys.map((k) => `<td>${item[k] === null ? "" : item[k]}</td>`).join("")}</tr>`,
+    )
+    .join("");
 }
 
-function collapseAll() {
-  document
-    .querySelectorAll(".details-row")
-    .forEach((row) => (row.style.display = "none"));
-  document
-    .querySelectorAll(".expandable-row")
-    .forEach((row) => row.classList.remove("expanded-row"));
-  updateToggleButtons();
-}
+function triggerSearch() {
+  const term = document.getElementById("searchInput").value.toLowerCase();
 
-// Checks the state of the table and greys out the buttons accordingly
-function updateToggleButtons() {
-  const btnExpand = document.getElementById("btnExpandAll");
-  const btnCollapse = document.getElementById("btnCollapseAll");
+  const filtered = mlaData.filter(
+    (mla) =>
+      (mla.firstName || "").toLowerCase().includes(term) ||
+      (mla.lastName || "").toLowerCase().includes(term) ||
+      (mla.constituencyName || "").toLowerCase().includes(term) ||
+      (mla.roles || "").toLowerCase().includes(term) ||
+      (mla.email || "").toLowerCase().includes(term),
+  );
 
-  if (!btnExpand || !btnCollapse) return;
+  if (isRawView) renderRawTable(filtered);
+  else renderTable(filtered);
 
-  const totalRows = document.querySelectorAll(".expandable-row").length;
-  const expandedRows = document.querySelectorAll(".expanded-row").length;
-
-  if (totalRows === 0) {
-    // If search results are empty, disable both
-    btnExpand.disabled = true;
-    btnCollapse.disabled = true;
-  } else {
-    // Disable 'Expand All' if everything is already expanded
-    btnExpand.disabled = expandedRows === totalRows;
-    // Disable 'Collapse All' if everything is already collapsed
-    btnCollapse.disabled = expandedRows === 0;
+  // Ensure the sort arrows persist after the DOM is redrawn by a search or view toggle
+  if (typeof updateSortUI === "function") {
+    updateSortUI();
   }
 }
 
-// --- Sorting Logic ---
 function sortData(column, forceDirection = null) {
   if (forceDirection) {
     currentSort.direction = forceDirection;
@@ -240,9 +255,14 @@ function sortData(column, forceDirection = null) {
       valA = getPartyInfo(a).label;
       valB = getPartyInfo(b).label;
     } else {
-      valA = (a[column] || "").toLowerCase();
-      valB = (b[column] || "").toLowerCase();
+      valA = a[column];
+      valB = b[column];
+      if (typeof valA === "string") valA = valA.toLowerCase();
+      if (typeof valB === "string") valB = valB.toLowerCase();
     }
+
+    if (valA == null) valA = "";
+    if (valB == null) valB = "";
 
     if (valA < valB) return -1 * directionMod;
     if (valA > valB) return 1 * directionMod;
@@ -257,32 +277,82 @@ function updateSortUI() {
   document.querySelectorAll("th.sortable").forEach((th) => {
     th.classList.remove("sort-asc", "sort-desc");
   });
-  const activeHeader = document.querySelector(
-    `th[data-sort="${currentSort.column}"]`,
-  );
-  if (activeHeader) {
-    activeHeader.classList.add(`sort-${currentSort.direction}`);
+
+  // Apply sort styles to matching headers
+  document
+    .querySelectorAll(`th[data-sort="${currentSort.column}"]`)
+    .forEach((th) => {
+      th.classList.add(`sort-${currentSort.direction}`);
+    });
+}
+
+function expandAll() {
+  document
+    .querySelectorAll(".details-row")
+    .forEach((row) => (row.style.display = "table-row"));
+  document
+    .querySelectorAll(".expandable-row")
+    .forEach((row) => row.classList.add("expanded-row"));
+
+  document
+    .querySelectorAll(".chevron")
+    .forEach((chevron) => (chevron.innerText = "▲"));
+  updateToggleButtons();
+}
+
+function collapseAll() {
+  document
+    .querySelectorAll(".details-row")
+    .forEach((row) => (row.style.display = "none"));
+  document
+    .querySelectorAll(".expandable-row")
+    .forEach((row) => row.classList.remove("expanded-row"));
+
+  document
+    .querySelectorAll(".chevron")
+    .forEach((chevron) => (chevron.innerText = "▼"));
+  updateToggleButtons();
+}
+
+function toggleDetails(index) {
+  const detailsRow = document.getElementById(`details-${index}`);
+  const mainRow = document.getElementById(`row-${index}`);
+  const chevron = document.getElementById(`chevron-${index}`);
+
+  if (detailsRow.style.display === "none") {
+    detailsRow.style.display = "table-row";
+    mainRow.classList.add("expanded-row");
+    if (chevron) chevron.innerText = "▲";
+  } else {
+    detailsRow.style.display = "none";
+    mainRow.classList.remove("expanded-row");
+    if (chevron) chevron.innerText = "▼";
+  }
+  updateToggleButtons();
+}
+
+function updateToggleButtons() {
+  const btnExpand = document.getElementById("btnExpandAll");
+  const btnCollapse = document.getElementById("btnCollapseAll");
+
+  if (!btnExpand || !btnCollapse) return;
+
+  const totalRows = document.querySelectorAll(".expandable-row").length;
+  const expandedRows = document.querySelectorAll(".expanded-row").length;
+
+  if (totalRows === 0) {
+    btnExpand.disabled = true;
+    btnCollapse.disabled = true;
+  } else {
+    btnExpand.disabled = expandedRows === totalRows;
+    btnCollapse.disabled = expandedRows === 0;
   }
 }
 
+// Bind sorting to directory column headers
 document.querySelectorAll("th.sortable").forEach((th) => {
   th.addEventListener("click", () => sortData(th.dataset.sort));
 });
 
-// --- Search Logic ---
-function triggerSearch() {
-  const term = document.getElementById("searchInput").value.toLowerCase();
-  const filtered = mlaData.filter(
-    (mla) =>
-      (mla.firstName || "").toLowerCase().includes(term) ||
-      (mla.lastName || "").toLowerCase().includes(term) ||
-      (mla.constituencyName || "").toLowerCase().includes(term) ||
-      (mla.roles || "").toLowerCase().includes(term) ||
-      (mla.email || "").toLowerCase().includes(term),
-  );
-  renderTable(filtered);
-}
-
 document.getElementById("searchInput").addEventListener("input", triggerSearch);
-
 init();

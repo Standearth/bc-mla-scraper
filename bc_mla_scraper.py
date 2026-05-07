@@ -70,7 +70,6 @@ class MLAScraper:
                         isDoctor
                         isHonourable
                         constituencyId
-                        govEmail
                         officePhone
                         member: memberByMemberId {
                             prefix
@@ -191,7 +190,6 @@ class MLAScraper:
                     "firstName": first_name,
                     "lastName": last_name,
                     "email": member.get("legislativeEmail", ""),
-                    "govEmail": node.get("govEmail", ""),
                     "partyName": party.get("name", ""),
                     "partyAbbreviation": party.get("abbreviation", ""),
                     "roles": roles_str,

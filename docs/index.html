@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BC MLA Directory | Stand.earth</title>
+    <title>BC MLA Directory</title>
     <link rel="stylesheet" href="style.css" />
-
     <script
       src="https://unpkg.com/libphonenumber-js@1.10.49/bundle/libphonenumber-js.min.js"
       defer
@@ -14,20 +13,23 @@
   </head>
   <body>
     <div class="container">
-      <h1>🏛️ BC MLA Directory</h1>
-      <p>
+      <div class="header-row">
+        <h1 id="mainHeader">🏛️ BC MLA Directory</h1>
+        <div id="headerActions" class="header-actions"></div>
+      </div>
+      <p id="intro">
         Daily-updated data of the current Members of the Legislative Assembly
         for British Columbia.
       </p>
 
-      <div class="controls">
+      <div class="controls" id="controls">
         <input
           type="text"
           id="searchInput"
           class="search-box"
           placeholder="Search by constituency, name, or role..."
         />
-        <div class="btn-group">
+        <div class="btn-group" id="downloadButtons">
           <a href="bc_mlas.csv" class="btn">📄 Download CSV</a>
           <a href="bc_mlas.json" class="btn btn-json">📦 Download JSON</a>
         </div>
@@ -36,7 +38,7 @@
       <div id="loading" class="loading">Fetching latest data...</div>
 
       <div id="tableArea" style="display: none">
-        <div class="table-actions">
+        <div class="table-actions" id="actionButtons">
           <button id="btnExpandAll" onclick="expandAll()" class="btn-small">
             Expand All
           </button>
@@ -48,16 +50,25 @@
           >
             Collapse All
           </button>
+          <button
+            id="viewToggle"
+            onclick="toggleViewMode()"
+            class="btn-small btn-toggle"
+          >
+            🗄️ View Raw Data
+          </button>
         </div>
 
-        <div class="table-wrapper">
+        <div id="directoryWrapper" class="table-wrapper">
           <table id="mlaTable">
             <thead>
               <tr>
                 <th data-sort="constituencyName" class="sortable">
                   Constituency <span class="sort-icon"></span>
                 </th>
-                <th>Photo</th>
+                <th data-sort="imagePath" class="sortable">
+                  Photo <span class="sort-icon"></span>
+                </th>
                 <th data-sort="name" class="sortable">
                   Name <span class="sort-icon"></span>
                 </th>
@@ -72,10 +83,17 @@
             <tbody id="tableBody"></tbody>
           </table>
         </div>
+
+        <div id="rawWrapper" class="table-wrapper" style="display: none">
+          <table class="raw-table">
+            <thead id="rawTableHead"></thead>
+            <tbody id="rawTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="footer">
+    <div id="mainFooter" class="footer">
       <p>
         Maintained by
         <a href="https://stand.earth" target="_blank">Stand.earth</a> |
