@@ -115,6 +115,7 @@ class MLAScraper:
                             nodes {
                                 roleByRoleId {
                                     title
+                                    email
                                 }
                             }
                         }
@@ -160,14 +161,20 @@ class MLAScraper:
             con_offices = constituency.get("offices", {}).get("nodes", [])
             con_office = con_offices[0] if con_offices else {}
 
-            # Extract and join all active roles/ministries
+            # Extract and join all active roles/ministries, and hunt for a ministry email
             ministry_nodes = node.get("ministry", {}).get("nodes", [])
-            roles = [
-                m.get("roleByRoleId", {}).get("title", "")
-                for m in ministry_nodes
-                if m.get("roleByRoleId")
-            ]
+            roles = []
+            ministry_emails = []
+            for m in ministry_nodes:
+                role_info = m.get("roleByRoleId")
+                if role_info:
+                    if role_info.get("title"):
+                        roles.append(role_info.get("title"))
+                    if role_info.get("email"):
+                        ministry_emails.append(role_info.get("email"))
+
             roles_str = " | ".join(filter(None, roles))
+            ministry_email = ministry_emails[0] if ministry_emails else ""
 
             first_name = member.get("firstName", "")
             last_name = member.get("lastName", "")
@@ -190,6 +197,7 @@ class MLAScraper:
                     "firstName": first_name,
                     "lastName": last_name,
                     "email": member.get("legislativeEmail", ""),
+                    "ministryEmail": ministry_email,  # <--- NEW FIELD ADDED HERE
                     "partyName": party.get("name", ""),
                     "partyAbbreviation": party.get("abbreviation", ""),
                     "roles": roles_str,
