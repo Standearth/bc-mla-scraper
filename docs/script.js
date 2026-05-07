@@ -60,9 +60,15 @@ function renderTable(items) {
     .map((mla, index) => {
       const party = getPartyInfo(mla);
 
-      const emailHtml = mla.email
-        ? `<a href="mailto:${mla.email}" class="email-link" onclick="event.stopPropagation()">${mla.email}</a>`
+      const primaryEmailHtml = mla.email
+        ? `<div><a href="mailto:${mla.email}" class="email-link" onclick="event.stopPropagation()">${mla.email}</a></div>`
         : ``;
+
+      const ministryEmailHtml = mla.ministryEmail
+        ? `<div><a href="mailto:${mla.ministryEmail}" class="email-link" onclick="event.stopPropagation()">${mla.ministryEmail}</a></div>`
+        : ``;
+
+      const combinedEmailHtml = ministryEmailHtml + primaryEmailHtml;
 
       const rolesHtml = mla.roles
         ? `<p><strong>Roles:</strong> ${mla.roles}</p>`
@@ -110,7 +116,7 @@ function renderTable(items) {
                       ${mla.firstName} ${mla.lastName}
                   </a>
               </td>
-              <td>${emailHtml}</td>
+              <td>${combinedEmailHtml}</td>
               <td>
                   <span class="party-tag" style="background-color: ${party.color};">
                       ${party.label}
