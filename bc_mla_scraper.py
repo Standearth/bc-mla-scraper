@@ -56,9 +56,7 @@ class MLAScraper:
             node = data["data"]["allParliaments"]["nodes"][0]
             return node["number"], node["annotation"]
         except (KeyError, IndexError):
-            raise ValueError(
-                "Error parsing current parliament info. Data structure may have changed."
-            )
+            raise ValueError("Error parsing current parliament info.")
 
     def _fetch_mla_data(self, parliament_id):
         """Fetches the comprehensive MLA data for a specific parliament ID."""
@@ -72,13 +70,28 @@ class MLAScraper:
                         isDoctor
                         isHonourable
                         constituencyId
+                        govEmail
+                        officePhone
                         member: memberByMemberId {
                             prefix
                             firstName
                             lastName
+                            legislativeEmail
+                            electionYears
                         }
                         constituency: constituencyByConstituencyId {
                             name
+                            offices: constituencyOfficesByConstituencyId(first: 1, condition: {active: true}) {
+                                nodes {
+                                    address
+                                    city
+                                    postalcode
+                                    phoneNumber
+                                    fax
+                                    tollFreePhone
+                                    email
+                                }
+                            }
                         }
                         party: partyByPartyId {
                             name
@@ -88,12 +101,34 @@ class MLAScraper:
                             path
                             description
                         }
+                        legOffice: legislatureOfficeByLegislativeOfficeId {
+                            name
+                            phone
+                            fax
+                            legBuilding: legislatureBuildingByBuildingId {
+                                address
+                                city
+                                postalcode
+                                province
+                            }
+                        }
+                        ministry: memberRolesByMemberParliamentId(condition: {active: true}) {
+                            nodes {
+                                roleByRoleId {
+                                    title
+                                }
+                            }
+                        }
                     }
                 }
             }""",
         }
 
         response = self.session.post(self.GRAPHQL_URL, json=payload)
+
+        if not response.ok:
+            raise ValueError(f"GraphQL Error: {response.text}")
+
         response.raise_for_status()
         data = response.json()
 
@@ -110,7 +145,7 @@ class MLAScraper:
         parliament_number, parliament_annotation = self.get_current_parliament_info()
         raw_mlas = self._fetch_mla_data(parliament_number)
 
-        # Sort the list by constituencyId ascending, defaulting to 0 if missing
+        # Sort the list by constituencyId ascending
         raw_mlas = sorted(raw_mlas, key=lambda x: x.get("constituencyId") or 0)
 
         processed_mlas = []
@@ -119,16 +154,30 @@ class MLAScraper:
             constituency = node.get("constituency") or {}
             party = node.get("party") or {}
             image = node.get("image") or {}
+            leg_office = node.get("legOffice") or {}
+            leg_building = leg_office.get("legBuilding") or {}
+
+            # Safely get the first constituency office if it exists
+            con_offices = constituency.get("offices", {}).get("nodes", [])
+            con_office = con_offices[0] if con_offices else {}
+
+            # Extract and join all active roles/ministries
+            ministry_nodes = node.get("ministry", {}).get("nodes", [])
+            roles = [
+                m.get("roleByRoleId", {}).get("title", "")
+                for m in ministry_nodes
+                if m.get("roleByRoleId")
+            ]
+            roles_str = " | ".join(filter(None, roles))
 
             first_name = member.get("firstName", "")
             last_name = member.get("lastName", "")
 
-            # Construct the dynamic profile URL slug
+            # Construct dynamic profile URL slug
             url_slug = f"{last_name}-{first_name}"
             safe_slug = urllib.parse.quote(url_slug, safe="'")
             profile_url = f"https://www.leg.bc.ca/members/{parliament_number}{parliament_annotation}-Parliament/{safe_slug}"
 
-            # Construct absolute Image URL
             raw_image_path = image.get("path", "")
             full_image_path = (
                 f"{self.IMAGE_BASE_URL}{raw_image_path}" if raw_image_path else ""
@@ -141,29 +190,42 @@ class MLAScraper:
                     "prefix": member.get("prefix", ""),
                     "firstName": first_name,
                     "lastName": last_name,
+                    "email": member.get("legislativeEmail", ""),
+                    "govEmail": node.get("govEmail", ""),
                     "partyName": party.get("name", ""),
                     "partyAbbreviation": party.get("abbreviation", ""),
+                    "roles": roles_str,
+                    "electionYears": member.get("electionYears", ""),
                     "isHonourable": node.get("isHonourable", False),
                     "isDoctor": node.get("isDoctor", False),
                     "isCounsel": node.get("isCounsel", False),
                     "profileUrl": profile_url,
                     "imagePath": full_image_path,
                     "imageDescription": image.get("description", ""),
+                    # Legislative Office Details
+                    "legOfficeRoom": leg_office.get("name", ""),
+                    "legOfficePhone": leg_office.get("phone", ""),
+                    "legOfficeFax": leg_office.get("fax", ""),
+                    "legBuildingAddress": leg_building.get("address", ""),
+                    "legBuildingCity": leg_building.get("city", ""),
+                    "legBuildingPostalCode": leg_building.get("postalcode", ""),
+                    # Constituency Office Details
+                    "conOfficeAddress": (con_office.get("address") or "").strip(),
+                    "conOfficeCity": con_office.get("city", ""),
+                    "conOfficePostalCode": con_office.get("postalcode", ""),
+                    "conOfficePhone": con_office.get("phoneNumber", ""),
+                    "conOfficeFax": con_office.get("fax", ""),
+                    "conOfficeTollFree": con_office.get("tollFreePhone", ""),
+                    "conOfficeEmail": con_office.get("email", ""),
                 }
             )
 
         return processed_mlas
 
     def to_csv(self, mlas, filename=None):
-        """
-        Converts the MLA data to CSV format.
-        If filename is provided, writes to the file. Otherwise, returns the CSV as a string.
-        """
         if not mlas:
             return ""
-
         fieldnames = list(mlas[0].keys())
-
         if filename:
             with open(filename, mode="w", newline="", encoding="utf-8") as file:
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -178,10 +240,6 @@ class MLAScraper:
             return output.getvalue()
 
     def to_json(self, mlas, filename=None):
-        """
-        Converts the MLA data to JSON format.
-        If filename is provided, writes to the file. Otherwise, returns the JSON as a string.
-        """
         if filename:
             with open(filename, mode="w", encoding="utf-8") as file:
                 json.dump(mlas, file, indent=4)
@@ -194,24 +252,20 @@ def main():
     parser = argparse.ArgumentParser(
         description="Scrape active MLA data from the British Columbia Legislature."
     )
-
     parser.add_argument(
         "--csv",
         nargs="?",
         const=DEFAULT_CSV_FILE,
-        help=f"Export data to a CSV file. Optionally provide a custom filename (default: {DEFAULT_CSV_FILE}).",
+        help=f"Export to a CSV file (default: {DEFAULT_CSV_FILE}).",
     )
-
     parser.add_argument(
         "--json",
         nargs="?",
         const=DEFAULT_JSON_FILE,
-        help=f"Export data to a JSON file. Optionally provide a custom filename (default: {DEFAULT_JSON_FILE}).",
+        help=f"Export to a JSON file (default: {DEFAULT_JSON_FILE}).",
     )
-
     args = parser.parse_args()
 
-    # If the user runs the command with zero arguments, default to outputting the CSV
     if not args.csv and not args.json:
         args.csv = DEFAULT_CSV_FILE
 
@@ -226,7 +280,6 @@ def main():
         print(f"Failed to fetch data: {e}")
         return
 
-    # Handle outputs
     if args.csv:
         scraper.to_csv(data, args.csv)
         print(f"Data saved to CSV format -> {args.csv}")
