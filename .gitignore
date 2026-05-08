@@ -1,8 +1,10 @@
 # Build and Distribution artifacts
 build/
 dist/
+dist-ssr/
 *.egg-info/
 *.egg
+.vite/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -15,8 +17,23 @@ env/
 .venv/
 .env/
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # macOS system files
 .DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing
+coverage/
 
 # Ignore output files
 /*.csv
