@@ -19,16 +19,15 @@ Conversion Specification:
 6. Phone Number: Uses Constituency Toll-Free phone if present, otherwise Constituency Local phone.
    - Formats to standard North American style: (XXX) YYY-ZZZZ
 7. Organization: Populated with the Constituency Name.
-8. Constituency: Populated with the Constituency ID.
-9. Biography 1: 'Hon.' if `isHonourable` flag is True.
-10. Biography 2: 'K.C.' if `isCounsel` flag is True.
-11. Biography 4: Populated with the member's roles/ministries.
-12. Biography 5: Legislative Office Phone Number (formatted).
-13. Biography 6: Constituency Office Postal Code.
-14. Biography 7: Official Legislature Profile URL.
-15. X Handle: Placed here as a free field to hold the Ministry Email.
-16. Party: Populated with the member's full party name.
-17. Output format: 'bc_mlas_en_YYYYMMDD.csv' (default, can be overridden)
+8. Biography 1 (Constituency ID): Populated with the Constituency ID (Used for Matching).
+9. Biography 2 (Postal Code): Constituency Office Postal Code.
+10. X Handle (Ministry Email): Populated with the member's ministry email address.
+11. Biography 4 (Roles): Populated with the member's roles/ministries.
+12. Biography 5 (Honourable): 'Hon.' if `isHonourable` flag is True.
+13. Biography 6 (Counsel): 'K.C.' if `isCounsel` flag is True.
+14. Biography 7 (Profile URL): Official Legislature Profile URL.
+15. Party: Populated with the member's full party name.
+16. Output format: 'bc_mlas_en_YYYYMMDD.csv' (default, can be overridden)
 """
 
 import argparse
@@ -73,14 +72,13 @@ def process_for_engaging_networks(mlas):
             "Phone Number": phone,
             "Title": title,
             "Organization": mla.get("constituencyName", ""),
-            "Constituency": str(mla.get("constituencyId", "")),
-            "Biography 1": mla.get("isHonourableClean", ""),
-            "Biography 2": mla.get("isCounselClean", ""),
-            "X Handle": mla.get("ministryEmail", ""),
-            "Biography 4": mla.get("roles", ""),
-            "Biography 5": mla.get("legOfficePhoneClean", ""),
-            "Biography 6": mla.get("conOfficePostalCode", ""),
-            "Biography 7": mla.get("profileUrl", ""),
+            "Biography 1 (Constituency ID)": str(mla.get("constituencyId", "")),
+            "Biography 2 (Postal Code)": mla.get("conOfficePostalCode", ""),
+            "X Handle (Ministry Email)": mla.get("ministryEmail", ""),
+            "Biography 4 (Roles)": mla.get("roles", ""),
+            "Biography 5 (Honourable)": mla.get("isHonourableClean", ""),
+            "Biography 6 (Counsel)": mla.get("isCounselClean", ""),
+            "Biography 7 (Profile URL)": mla.get("profileUrl", ""),
             "Party": mla.get("partyName", ""),
         }
         en_rows.append(row)
