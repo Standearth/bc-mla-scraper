@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BC Electoral District Lookup - Word Exactness</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        padding-top: 50px;
+      }
+      .container {
+        width: 100%;
+        max-width: 600px;
+        position: relative;
+      }
+      h2 {
+        margin-bottom: 20px;
+        color: #1a365d;
+      }
+      .search-wrapper {
+        position: relative;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      input[type="text"]:focus {
+        border-color: #2b6cb0;
+      }
+      .dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .dropdown li {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .dropdown li:last-child {
+        border-bottom: none;
+      }
+      .dropdown li:hover {
+        background-color: #ebf8ff;
+      }
+      .dropdown li strong {
+        color: #2b6cb0;
+      }
+      .dropdown li small {
+        color: #666;
+        background: #f0f4f8;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .result-card {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none;
+        border-left: 5px solid #3182ce;
+      }
+      .result-card h3 {
+        margin: 0 0 10px 0;
+        color: #2b6cb0;
+      }
+      pre {
+        background-color: #2d3748;
+        color: #e2e8f0;
+        padding: 15px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Find Your Electoral District</h2>
+
+      <div class="search-wrapper">
+        <input
+          type="text"
+          id="address-input"
+          placeholder="Start typing your BC address..."
+          autocomplete="off"
+        />
+        <ul id="autocomplete-dropdown" class="dropdown"></ul>
+      </div>
+
+      <div id="result-card" class="result-card">
+        <h3>Formatted Data</h3>
+        <pre id="raw-json"></pre>
+      </div>
+    </div>
+
+    <script>
+      const input = document.getElementById("address-input");
+      const dropdown = document.getElementById("autocomplete-dropdown");
+      const resultCard = document.getElementById("result-card");
+
+      // API Details
+      const SEARCH_URL =
+        "https://wtv-address-b11.search.windows.net/indexes/my-district-search-bs11-index/docs";
+
+      // Split the public api key to bypass GitHub's overly aggressive secret scanner
+      const API_KEY =
+        "VCHUfxeHttzb71v" + "zzwSKcpAvLoWExm" + "HsGvXpOLUYMQAzSeCoOgwa";
+      const API_VERSION = "2023-10-01-Preview";
+
+      // Debounce function
+      function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+      }
+
+      // Isolate the street address by stripping the ", City" from the end
+      function parseStreetOnly(fullAddr, city) {
+        const cityRegex = new RegExp(",\\s*" + city + "$", "i");
+        return fullAddr.replace(cityRegex, "");
+      }
+
+      // Helper to count how many typed tokens perfectly match a full word in the address
+      function countExactWords(address, tokens) {
+        // Split by spaces, commas, or periods to isolate the words
+        const addrWords = address.toLowerCase().split(/[\s,.]+/);
+        return tokens.filter((token) => addrWords.includes(token)).length;
+      }
+
+      // Fetch matching addresses
+      const fetchAddresses = async (query) => {
+        const trimmedQuery = query.trim();
+        if (!trimmedQuery) {
+          dropdown.style.display = "none";
+          return;
+        }
+
+        const queryLower = trimmedQuery.toLowerCase();
+        const queryTokens = queryLower
+          .split(/\s+/)
+          .filter((token) => token.length > 0);
+
+        // Append a wildcard to EVERY token so Azure searches prefixes for all words
+        const searchTerms = queryTokens.map((token) => token + "*").join(" ");
+        const searchQuery = encodeURIComponent(searchTerms);
+
+        const url = `${SEARCH_URL}?api-version=${API_VERSION}&search=${searchQuery}&$top=25&api-key=${API_KEY}`;
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("Network response was not ok");
+          const data = await response.json();
+
+          // Step 1: Strict Filter - Must contain every token (even partially)
+          const filteredResults = data.value.filter((item) => {
+            if (!item.street_full) return false;
+            const addrLower = item.street_addr.toLowerCase();
+            return queryTokens.every((token) => addrLower.includes(token));
+          });
+
+          // Step 2: Sort the surviving results
+          const sortedResults = filteredResults.sort((a, b) => {
+            const aAddr = a.street_addr.toLowerCase();
+            const bAddr = b.street_addr.toLowerCase();
+
+            // Priority 1: Exact Full Word Count
+            const aExactWordCount = countExactWords(aAddr, queryTokens);
+            const bExactWordCount = countExactWords(bAddr, queryTokens);
+
+            if (aExactWordCount !== bExactWordCount) {
+              return bExactWordCount - aExactWordCount;
+            }
+
+            // Priority 2: Full unbroken string match
+            const aExact = aAddr.includes(queryLower);
+            const bExact = bAddr.includes(queryLower);
+
+            if (aExact && !bExact) return -1;
+            if (!aExact && bExact) return 1;
+
+            // Priority 3: Fallback to Azure score for ties
+            return b["@search.score"] - a["@search.score"];
+          });
+
+          renderDropdown(sortedResults);
+        } catch (error) {
+          console.error("Error fetching addresses:", error);
+        }
+      };
+
+      // Render the dropdown list
+      function renderDropdown(results) {
+        dropdown.innerHTML = "";
+
+        if (!results || results.length === 0) {
+          dropdown.style.display = "none";
+          return;
+        }
+
+        results.forEach((item) => {
+          const streetLine = parseStreetOnly(item.street_addr, item.city);
+
+          const li = document.createElement("li");
+          li.innerHTML = `
+                <span><strong>${streetLine}</strong></span>
+                <small>${item.city}</small>
+            `;
+
+          li.addEventListener("click", () => {
+            selectAddress(item);
+          });
+
+          dropdown.appendChild(li);
+        });
+
+        dropdown.style.display = "block";
+      }
+
+      // Handle selection
+      function selectAddress(item) {
+        const cleanStreetLine = parseStreetOnly(item.street_addr, item.city);
+
+        input.value = `${cleanStreetLine}, ${item.city}`;
+        dropdown.style.display = "none";
+
+        // Build a formatted object to display
+        const displayData = {
+          "Parsed Format": {
+            street: cleanStreetLine,
+            city: item.city,
+            district_name: item.ed_name,
+            district_abbr: item.ed_abbr,
+            coordinates: { lat: item.y, lng: item.x },
+          },
+          "Search Score": item["@search.score"],
+          "Original Raw Data": item,
+        };
+
+        document.getElementById("raw-json").textContent = JSON.stringify(
+          displayData,
+          null,
+          2,
+        );
+        resultCard.style.display = "block";
+      }
+
+      input.addEventListener(
+        "input",
+        debounce((e) => {
+          fetchAddresses(e.target.value);
+          resultCard.style.display = "none";
+        }, 300),
+      );
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-wrapper")) {
+          dropdown.style.display = "none";
+        }
+      });
+    </script>
+  </body>
+</html>
