@@ -5,8 +5,11 @@ import json
 import urllib.parse
 
 import requests
-
-from formatters import clean_party_abbreviation, format_phone, parse_address
+from formatters import (
+    clean_party_abbreviation,
+    format_phone,
+    parse_address,
+)
 
 DEFAULT_CSV_FILE = "bc_mlas.csv"
 DEFAULT_JSON_FILE = "bc_mlas.json"
