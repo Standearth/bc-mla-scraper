@@ -12,6 +12,17 @@ export interface AzureElectoralResult {
   y: number;
 }
 
+export interface MlaSummary {
+  firstName: string;
+  lastName: string;
+  party: string;
+  partyAbbr: string;
+  email: string;
+  phone: string;
+  image: string;
+  url: string;
+}
+
 export interface ValidatedAddress {
   street: string;
   city: string;
@@ -21,8 +32,10 @@ export interface ValidatedAddress {
   districtAbbr: string;
   coordinates: { lat: number; lng: number };
   isGoogleValidated: boolean;
-  rawAzureData: AzureElectoralResult;
+  mla?: MlaSummary;
+  rawAzureData?: AzureElectoralResult;
   rawGoogleData?: any;
+  rawMlaData?: any; // Full matched object from the scraper
 }
 
 export interface LookupConfig {
@@ -31,5 +44,9 @@ export interface LookupConfig {
   searchUrl?: string;
   azureKey?: string;
   azureVersion?: string;
+  mlaDataUrl?: string;
+  returnRawAzure?: boolean;
+  returnRawGoogle?: boolean;
+  returnRawMla?: boolean;
   onSelect?: (data: ValidatedAddress) => void;
 }

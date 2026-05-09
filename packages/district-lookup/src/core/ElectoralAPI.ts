@@ -10,9 +10,17 @@ export class ElectoralAPI {
   private azureKey: string;
   private azureVersion: string;
   private googleApiKey?: string;
+  private mlaDataUrl: string;
+  private cachedMlaData: any[] | null = null;
 
   constructor(config: LookupConfig = {}) {
-    this.config = { maxResults: 25, ...config };
+    this.config = {
+      maxResults: 25,
+      returnRawAzure: false,
+      returnRawGoogle: false,
+      returnRawMla: false,
+      ...config,
+    };
 
     this.searchUrl = this.config.searchUrl || import.meta.env.VITE_SEARCH_URL;
     this.azureKey = this.config.azureKey || import.meta.env.VITE_AZURE_KEY;
@@ -20,6 +28,12 @@ export class ElectoralAPI {
       this.config.azureVersion || import.meta.env.VITE_AZURE_VERSION;
     this.googleApiKey =
       this.config.googleApiKey || import.meta.env.VITE_GOOGLE_API_KEY;
+
+    // Default to the root path for local overrides, falling back to an env variable
+    this.mlaDataUrl =
+      this.config.mlaDataUrl ||
+      import.meta.env.VITE_MLA_DATA_URL ||
+      "/bc_mlas.json";
 
     if (!this.searchUrl || !this.azureKey) {
       console.warn("DistrictLookup: Missing Azure Search credentials.");
@@ -35,6 +49,27 @@ export class ElectoralAPI {
   private countExactWords(address: string, tokens: string[]): number {
     const addrWords = address.toLowerCase().split(/[\s,.]+/);
     return tokens.filter((token) => addrWords.includes(token)).length;
+  }
+
+  private async getMlaData(): Promise<any[]> {
+    // 1. Tell TypeScript that if it passes this check, it's definitely an array
+    if (this.cachedMlaData) return this.cachedMlaData as any[];
+    if (!this.mlaDataUrl) return [];
+
+    try {
+      const response = await fetch(this.mlaDataUrl);
+      if (!response.ok) throw new Error("Failed to fetch MLA data");
+
+      // 2. Save it to a local variable first
+      const data = await response.json();
+      this.cachedMlaData = data;
+
+      // 3. Return the local variable
+      return data;
+    } catch (error) {
+      console.warn("Could not load MLA data:", error);
+      return [];
+    }
   }
 
   public async searchAddress(query: string): Promise<AzureElectoralResult[]> {
@@ -109,9 +144,39 @@ export class ElectoralAPI {
       districtAbbr: azureResult.ed_abbr,
       coordinates: { lat: azureResult.y, lng: azureResult.x }, // Elections BC defaults
       isGoogleValidated: false,
-      rawAzureData: azureResult,
     };
 
+    // Attach Raw Azure Data if enabled
+    if (this.config.returnRawAzure) {
+      baseResult.rawAzureData = azureResult;
+    }
+
+    // --- MLA Matching ---
+    const mlaDataList = await this.getMlaData();
+    const matchedMla = mlaDataList.find(
+      (m) => m.districtCode === azureResult.ed_abbr,
+    );
+
+    if (matchedMla) {
+      // Clean, sanitized object
+      baseResult.mla = {
+        firstName: matchedMla.firstName,
+        lastName: matchedMla.lastName,
+        party: matchedMla.partyName,
+        partyAbbr: matchedMla.partyAbbreviationClean,
+        email: matchedMla.email,
+        phone: matchedMla.conOfficePhoneClean || matchedMla.legOfficePhoneClean, // Fallback to leg office if con office is blank
+        image: matchedMla.imagePath,
+        url: matchedMla.profileUrl,
+      };
+
+      // Raw data attachment
+      if (this.config.returnRawMla) {
+        baseResult.rawMlaData = matchedMla;
+      }
+    }
+
+    // --- Google Validation ---
     if (!this.googleApiKey) return baseResult;
 
     try {
@@ -133,18 +198,19 @@ export class ElectoralAPI {
       if (!response.ok) throw new Error("Google Validation API Error");
       const data = await response.json();
 
-      baseResult.rawGoogleData = data;
+      if (this.config.returnRawGoogle) {
+        baseResult.rawGoogleData = data;
+      }
 
-      // 1. Extract Postal Code
+      // Extract Postal Code
       const postalCodeComponent =
         data.result?.address?.postalAddress?.postalCode;
-
       if (postalCodeComponent) {
         baseResult.postalCode = postalCodeComponent;
         baseResult.isGoogleValidated = true;
       }
 
-      // 2. Prioritize Google geocode coordinates if available
+      // Prioritize Google geocode coordinates if available
       const googleLocation = data.result?.geocode?.location;
       if (
         googleLocation &&
