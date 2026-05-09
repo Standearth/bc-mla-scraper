@@ -224,6 +224,7 @@ export class LookupWidget {
     this.inputElement.value = `${streetLine}, ${item.city}`;
     this.dropdownElement.style.display = "none";
     this.activeIndex = -1;
+    this.inputElement.blur();
 
     const finalData = await this.api.getValidatedDetails(item);
 
