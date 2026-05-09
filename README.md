@@ -1,20 +1,27 @@
-# BC MLA Scraper
+# BC MLA Tools
+
+A collection of tools to retrieve, format, and utilize active Member of Legislative Assembly (MLA) and electoral district data for the British Columbia Legislature.
+
+This monorepo contains two primary packages:
+
+1. **BC MLA Scraper**: A Python CLI and module to scrape the BC Legislature website.
+2. **District Lookup Widget**: A drop-in Vanilla JS UI widget to search BC addresses and find electoral districts.
+
+---
+
+## 1. BC MLA Scraper (Python)
 
 A Python module and command-line tool to retrieve, format, and export active Member of Legislative Assembly (MLA) data from the British Columbia Legislature.
 
-**Author:** Matthew Carroll (stand.earth)
+### Installation
 
-## Installation
-
-You can install this package locally using `pip`. Navigate to the directory containing `pyproject.toml` and run:
+You can install this package locally using `pip`. Navigate to the `packages/scraper/` directory containing `pyproject.toml` and run:
 
 ```bash
 pip install -e .
 ```
 
-## Usage
-
-### As a Command-Line Tool
+### Usage (Command-Line)
 
 Once installed, you can run the scraper directly from your terminal.
 
@@ -37,7 +44,7 @@ bc-mla-scraper --json
 bc-mla-scraper --csv my_custom_data.csv --json output_folder/my_data.json
 ```
 
-### As a Python Module
+### Usage (Python Module)
 
 You can easily import and use the scraper in your own Python projects to handle the data programmatically:
 
@@ -54,53 +61,84 @@ print(f"Retrieved {len(mla_data)} records.")
 # Save directly to files
 scraper.to_csv(mla_data, "output.csv")
 scraper.to_json(mla_data, "output.json")
-
-# Or get the data as formatted strings (useful for passing to APIs or databases)
-csv_string = scraper.to_csv(mla_data)
-json_string = scraper.to_json(mla_data)
 ```
 
-## Data Fields Included
+### Usage (Hotlinking)
 
-The scraper standardizes and exports the following fields for each MLA:
+The [csv](https://standearth.github.io/bc-mla-tools/bc_mlas.csv) and [json](https://standearth.github.io/bc-mla-tools/bc_mlas.json) files are updated nightly and hosted on GitHub pages, and you are welcome to hotlink them directly for use in other projects.
 
-**Electoral District Details:**
+### Data Fields Included
 
-- `constituencyId`: The ID of the electoral district.
-- `constituencyName`: The name of the electoral district.
+The scraper standardizes and exports comprehensive data for each MLA, including:
 
-**MLA Details:**
+- **Electoral District Details:** `constituencyId`, `constituencyName`
+- **MLA Details:** `prefix`, `firstName`, `lastName`, `email`, `partyName`, `roles`, `electionYears`, `isHonourable`, `isDoctor`, `isCounsel`, `profileUrl`, `imagePath`
+- **Legislative Office Details:** `legOfficeRoom`, `legOfficePhone`, `legOfficeFax`, `legBuildingAddress`, `legBuildingCity`, `legBuildingPostalCode`
+- **Constituency Office Details:** `conOfficeAddress` (Parsed into Suite, Street, and PO Box), `conOfficeCity`, `conOfficePostalCode`, `conOfficePhone`, `conOfficeTollFree`, `conOfficeFax`, `conOfficeEmail`
 
-- `prefix`: The member's prefix (e.g., Mr., Ms., Hon.).
-- `firstName`: The member's first name.
-- `lastName`: The member's last name.
-- `email`: The member's primary legislative email address.
-- `partyName`: The full name of the member's political party.
-- `partyAbbreviation`: The abbreviated party name (not actually abbreviated most of the time, but it's what the legislature site provides.)
-- `roles`: A string containing the member's active roles or ministries (separated by `|`).
-- `electionYears`: A string listing the years the member was elected.
-- `isHonourable`: Boolean indicating if the member holds the "Honourable" title.
-- `isDoctor`: Boolean indicating if the member is a doctor.
-- `isCounsel`: Boolean indicating if the member is Queen's/King's Counsel.
-- `profileUrl`: The dynamically generated, absolute URL to the member's official profile page.
-- `imagePath`: The absolute URL to the member's official headshot image.
-- `imageDescription`: The alt-text description for the headshot.
+---
 
-**Legislative Office Details:**
+## 2. District Lookup Widget (JavaScript/TypeScript)
 
-- `legOfficeRoom`: The room number or name of their legislative office.
-- `legOfficePhone`: The phone number for their legislative office.
-- `legOfficeFax`: The fax number for their legislative office.
-- `legBuildingAddress`: The street address of the legislative building.
-- `legBuildingCity`: The city of the legislative building (e.g., Victoria).
-- `legBuildingPostalCode`: The postal code of the legislative building.
+A lightweight (~5kb) Vanilla JavaScript widget that attaches an autocomplete dropdown to any text input. It searches BC addresses using Elections BC's [My District](https://mydistrict.elections.bc.ca) tool, and optionally adds postcodes using the Google Maps Address Validation API.
 
-**Constituency Office Details:**
+### Example
 
-- `conOfficeAddress`: The street address of their primary constituency office.
-- `conOfficeCity`: The city of their constituency office.
-- `conOfficePostalCode`: The postal code of their constituency office.
-- `conOfficePhone`: The local phone number for their constituency office.
-- `conOfficeFax`: The fax number for their constituency office.
-- `conOfficeTollFree`: The toll-free phone number for their constituency office.
-- `conOfficeEmail`: The general contact email for the constituency office.
+[https://standearth.github.io/bc-mla-tools/lookup.html](https://standearth.github.io/bc-mla-tools/lookup.html)
+
+### Integration
+
+Include the [compiled JavaScript](https://standearth.github.io/bc-mla-tools/district-lookup.js) file in your HTML.
+
+```html
+<script src="https://standearth.github.io/bc-mla-tools/district-lookup.js"></script>
+```
+
+### Usage
+
+Create a standard text input, and initialize the widget by targeting its selector:
+
+```html
+<input
+  type="text"
+  id="address-input"
+  placeholder="Start typing your BC address..."
+  autocomplete="off"
+/>
+
+<script>
+  const widget = new DistrictLookup.LookupWidget("#address-input", {
+    // Optional: Pass your Google Maps API Key to fetch full postal codes
+    googleApiKey: "YOUR_GOOGLE_API_KEY_HERE",
+
+    // Callback fired when a user selects an address
+    onSelect: (data) => {
+      console.log("Selected District:", data.districtName);
+      console.log("Full Address Data:", data);
+    },
+  });
+</script>
+```
+
+### Configuration Options
+
+- **`googleApiKey`** _(string, optional)_: A Google Maps API key restricted to the Address Validation API. If provided, the widget will execute a background request to fetch the official postal code for the user's selected address.
+- **`onSelect`** _(function, optional)_: A callback function that receives a `ValidatedAddress` object when the user clicks a result. The object contains:
+  - `street`, `city`, `province`, `postalCode`
+  - `districtName`, `districtAbbr`
+  - `coordinates` (lat/lng)
+  - `isGoogleValidated` (boolean indicating if the postal code was successfully retrieved)
+  - `rawAzureData` (the original search result)
+
+---
+
+## Automated Deployments & Data Updates
+
+This repository uses GitHub Actions to maintain fresh data without manual intervention.
+
+Every night at 1:00 AM Pacific Time, the `deploy.yml` workflow:
+
+1. Compiles the TypeScript `DistrictLookup` widget.
+2. Runs the Python scraper to fetch the absolute latest MLA data from the BC Legislature.
+3. Commits any changes to the data back to the repository's `main` branch (for version control).
+4. Deploys the frontend tools and the updated CSV/JSON data to GitHub Pages via the `public/` folder.
