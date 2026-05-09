@@ -6,7 +6,7 @@ GEO_PKG     := packages/geo-processor
 
 ED_GEOJSON_IN  := data/BCGW_02001F02_1778300296741_14604.zip
 ED_GEOJSON_OUT := public/bc_electoral_districts.geojson
-TOLERANCE      ?= 0.001
+TOLERANCE      ?= 0.0004
 
 
 # --- Development ---
@@ -52,6 +52,8 @@ test:
 process-geo:
 	@echo "Simplifying Electoral Boundaries (tolerance: $(TOLERANCE))..."
 	simplify-geojson $(ED_GEOJSON_IN) -o $(ED_GEOJSON_OUT) -t $(TOLERANCE)
+	@echo "Extracting district codes..."
+	extract-mapping $(ED_GEOJSON_OUT) ED_ABBREVIATION ED_NAME -o $(PUBLIC_DIR)/district_codes.json
 
 .PHONY: help
 help:

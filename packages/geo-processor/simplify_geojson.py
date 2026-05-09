@@ -43,8 +43,6 @@ def process_file(input_path, output_path, tolerance):
     topo = tp.Topology(gdf, prequantize=False)
     simplified_topo = topo.toposimplify(tolerance)
 
-    # Fix for Pylance "reportOptionalMemberAccess" error
-    # We assert it's not None so the type-checker knows it's safe to call .to_gdf()
     assert simplified_topo is not None, "Topology simplification failed"
     gdf_simplified = simplified_topo.to_gdf()
 

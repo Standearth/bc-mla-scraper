@@ -2,6 +2,7 @@ import argparse
 import csv
 import io
 import json
+import os
 import urllib.parse
 
 import requests
@@ -13,6 +14,10 @@ from formatters import (
 
 DEFAULT_CSV_FILE = "bc_mlas.csv"
 DEFAULT_JSON_FILE = "bc_mlas.json"
+
+# Dynamically calculate the root of the repository (src -> scraper -> packages -> bc-mla-tools)
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+DEFAULT_MAPPING_FILE = os.path.join(ROOT_DIR, "public", "district_codes.json")
 
 
 class MLAScraper:
@@ -29,9 +34,20 @@ class MLAScraper:
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
-    def __init__(self):
+    def __init__(self, mapping_file_path=None):
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
+
+        # Load the district code mappings into memory
+        self.district_codes = {}
+        if mapping_file_path and os.path.exists(mapping_file_path):
+            with open(mapping_file_path, "r", encoding="utf-8") as f:
+                self.district_codes = json.load(f)
+        else:
+            print(f"Warning: District mapping file not found at {mapping_file_path}.")
+            print(
+                "Run 'make process-geo' first to generate it. District codes will be blank."
+            )
 
     def get_current_parliament_info(self):
         """Fetches the ID and annotation (e.g. 'rd', 'th') of the currently active parliament."""
@@ -150,9 +166,6 @@ class MLAScraper:
         parliament_number, parliament_annotation = self.get_current_parliament_info()
         raw_mlas = self._fetch_mla_data(parliament_number)
 
-        # Sort the list by constituencyId ascending
-        raw_mlas = sorted(raw_mlas, key=lambda x: x.get("constituencyId") or 0)
-
         processed_mlas = []
         for node in raw_mlas:
             member = node.get("member") or {}
@@ -183,6 +196,7 @@ class MLAScraper:
 
             first_name = member.get("firstName", "")
             last_name = member.get("lastName", "")
+            constituency_name = constituency.get("name", "").strip()
 
             # Construct dynamic profile URL slug
             url_slug = f"{last_name}-{first_name}"
@@ -207,10 +221,23 @@ class MLAScraper:
                 party.get("name", ""), party.get("abbreviation", "")
             )
 
+            # Clean up em-dashes to match standard hyphens often found in GeoJSON
+            normalized_name = constituency_name.replace("—", "-")
+
+            # REVERSE LOOKUP: Find Code (key) where Name (value) matches
+            district_code = next(
+                (
+                    code
+                    for code, name in self.district_codes.items()
+                    if name == normalized_name
+                ),
+                "",
+            )
+
             processed_mlas.append(
                 {
-                    "constituencyId": node.get("constituencyId", ""),
-                    "constituencyName": constituency.get("name", ""),
+                    "districtCode": district_code,
+                    "constituencyName": constituency_name,
                     "prefix": member.get("prefix", ""),
                     "firstName": first_name,
                     "lastName": last_name,
@@ -260,6 +287,13 @@ class MLAScraper:
                 }
             )
 
+        processed_mlas = sorted(
+            processed_mlas,
+            key=lambda x: (
+                x["districtCode"] if x["districtCode"] != "" else x["constituencyName"]
+            ),
+        )
+
         return processed_mlas
 
     def to_csv(self, mlas, filename=None):
@@ -304,13 +338,18 @@ def main():
         const=DEFAULT_JSON_FILE,
         help=f"Export to a JSON file (default: {DEFAULT_JSON_FILE}).",
     )
+    parser.add_argument(
+        "--mapping",
+        default=DEFAULT_MAPPING_FILE,
+        help="Path to the JSON file mapping district codes to names.",
+    )
     args = parser.parse_args()
 
     if not args.csv and not args.json:
         args.csv = DEFAULT_CSV_FILE
 
     print("Initializing scraper...")
-    scraper = MLAScraper()
+    scraper = MLAScraper(mapping_file_path=args.mapping)
 
     print("Fetching active MLA data...")
     try:

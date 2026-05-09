@@ -17,3 +17,7 @@ dependencies = [
 
 [project.scripts]
 simplify-geojson = "simplify_geojson:main"
+extract-mapping = "extract_mapping:main"
+
+[tool.setuptools]
+py-modules = ["simplify_geojson", "extract_mapping"]
