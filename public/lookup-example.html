@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BC Electoral District Lookup</title>
+    <link rel="stylesheet" href="lookup-example.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Find Your Electoral District</h2>
+
+      <input
+        type="text"
+        id="address-input"
+        placeholder="Start typing your BC address..."
+        autocomplete="off"
+      />
+
+      <div id="result-card" class="result-card">
+        <div class="card-header">
+          <div id="district-badge" class="district-badge"></div>
+          <div id="address-output" class="address-output"></div>
+        </div>
+
+        <details>
+          <summary>View Raw API Data</summary>
+          <pre id="raw-json"></pre>
+        </details>
+      </div>
+    </div>
+
+    <script src="district-lookup.js"></script>
+    <script src="lookup-example.js"></script>
+  </body>
+</html>
