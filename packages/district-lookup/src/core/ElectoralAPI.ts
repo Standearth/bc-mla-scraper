@@ -9,15 +9,17 @@ export class ElectoralAPI {
   private searchUrl: string;
   private azureKey: string;
   private azureVersion: string;
+  private googleApiKey?: string;
 
   constructor(config: LookupConfig = {}) {
     this.config = { maxResults: 25, ...config };
 
-    // Use config overrides if provided, otherwise fall back to .env variables
     this.searchUrl = this.config.searchUrl || import.meta.env.VITE_SEARCH_URL;
     this.azureKey = this.config.azureKey || import.meta.env.VITE_AZURE_KEY;
     this.azureVersion =
       this.config.azureVersion || import.meta.env.VITE_AZURE_VERSION;
+    this.googleApiKey =
+      this.config.googleApiKey || import.meta.env.VITE_GOOGLE_API_KEY;
 
     if (!this.searchUrl || !this.azureKey) {
       console.warn("DistrictLookup: Missing Azure Search credentials.");
@@ -110,10 +112,10 @@ export class ElectoralAPI {
       rawAzureData: azureResult,
     };
 
-    if (!this.config.googleApiKey) return baseResult;
+    if (!this.googleApiKey) return baseResult;
 
     try {
-      const googleUrl = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${this.config.googleApiKey}`;
+      const googleUrl = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${this.googleApiKey}`;
       const payload = {
         address: {
           regionCode: "CA",

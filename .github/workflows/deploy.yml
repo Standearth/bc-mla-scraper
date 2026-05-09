@@ -32,10 +32,14 @@ jobs:
 
       - name: Build District Lookup Widget
         working-directory: packages/district-lookup
+        env:
+          VITE_SEARCH_URL: ${{ vars.VITE_SEARCH_URL }}
+          VITE_AZURE_VERSION: ${{ vars.VITE_AZURE_VERSION }}
+          VITE_AZURE_KEY: ${{ secrets.VITE_AZURE_KEY }}
+          VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
         run: |
           npm ci
           npm run build
-          # This compiles district-lookup.js and copies it into docs/
 
       - name: Set up Python
         uses: actions/setup-python@v5

@@ -82,24 +82,15 @@
     <script src="district-lookup.js"></script>
 
     <script>
-      // The widget attaches itself to the input and handles all dropdown logic automatically
       const widget = new DistrictLookup.LookupWidget("#address-input", {
-        // You can pass a googleApiKey here to automatically validate the address!
-        // googleApiKey: "YOUR_GOOGLE_MAPS_API_KEY",
-
+        // No API keys needed here anymore!
         onSelect: (data) => {
-          // This callback fires when a user clicks an address in the dropdown
           const resultCard = document.getElementById("result-card");
           const jsonDisplay = document.getElementById("raw-json");
 
           jsonDisplay.textContent = JSON.stringify(data, null, 2);
           resultCard.style.display = "block";
         },
-      });
-
-      // Optionally hide the result card if the user starts typing again
-      document.getElementById("address-input").addEventListener("input", () => {
-        document.getElementById("result-card").style.display = "none";
       });
     </script>
   </body>
