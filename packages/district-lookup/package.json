@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && cp dist/district-lookup.iife.js ../../docs/district-lookup.js",
+    "build": "tsc && vite build && cp dist/district-lookup.iife.js ../../public/district-lookup.js",
     "test": "vitest run"
   },
   "devDependencies": {

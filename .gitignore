@@ -40,8 +40,8 @@ coverage/
 /*.json
 
 # Allow hosted data
-!docs/bc_mlas.csv
-!docs/bc_mlas.json
+!public/bc_mlas.csv
+!public/bc_mlas.json
 
 # Ignore compiled frontend widget
-docs/district-lookup.js
+public/district-lookup.js
