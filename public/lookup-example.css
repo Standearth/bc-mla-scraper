@@ -140,6 +140,31 @@ input[type="text"]:focus {
   margin-bottom: 4px;
 }
 
+.btn-nav {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e2e8f0;
+  color: #1e293b;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+.btn-nav:hover {
+  background-color: #cbd5e1;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 1rem;
+}
+
 /* --- DEVELOPER RAW JSON SECTION --- */
 details {
   border-top: 1px solid #cbd5e1;

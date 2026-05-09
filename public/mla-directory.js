@@ -68,9 +68,8 @@ function renderTable(items) {
         ? `<p>${mla.conOfficePostalCode}</p>`
         : "";
 
-      // ADDED TEL: LINKS HERE
       const conPhoneHtml = mla.conOfficePhoneClean
-        ? `<p>📞 <a href="tel:${mla.conOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficePhoneClean}</a></p>`
+        ? `<p class="contact-number">📞 <a href="tel:${mla.conOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficePhoneClean}</a></p>`
         : "";
       const conTollFreeHtml = mla.conOfficeTollFreeClean
         ? `<p>📞 <a href="tel:${mla.conOfficeTollFree}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficeTollFreeClean}</a></p>`
@@ -90,7 +89,7 @@ function renderTable(items) {
         ? `<p>${mla.legBuildingPostalCode}</p>`
         : "";
       const legPhoneHtml = mla.legOfficePhoneClean
-        ? `<p>📞 <a href="tel:${mla.legOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.legOfficePhoneClean}</a></p>`
+        ? `<p class="contact-number">📞 <a href="tel:${mla.legOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.legOfficePhoneClean}</a></p>`
         : "";
       const legFaxHtml = mla.legOfficeFaxClean
         ? `<p>📠 ${mla.legOfficeFaxClean}</p>`

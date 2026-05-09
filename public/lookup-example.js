@@ -13,6 +13,13 @@ const widget = new DistrictLookup.LookupWidget("#address-input", {
   returnRawGoogle: true,
   returnRawMla: true,
 
+  onClear: () => {
+    const resultCard = document.getElementById("result-card");
+    if (resultCard) {
+      resultCard.style.display = "none";
+    }
+  },
+
   onSelect: (data) => {
     const resultCard = document.getElementById("result-card");
     const addressOutput = document.getElementById("address-output");
@@ -39,8 +46,8 @@ const widget = new DistrictLookup.LookupWidget("#address-input", {
 
       // Handle dual emails if they are a minister
       const emailHtml = mla.ministryEmail
-        ? `<a href="mailto:${mla.ministryEmail}">${mla.ministryEmail}</a> <span style="color:#64748b; font-size:0.9em;">(Ministry)</span><br>
-           <a href="mailto:${mla.email}">${mla.email}</a> <span style="color:#64748b; font-size:0.9em;">(Constituency)</span>`
+        ? `<a href="mailto:${mla.ministryEmail}">${mla.ministryEmail}</a> <span style="color:#64748b; font-size:0.9em;"></span><br>
+           <a href="mailto:${mla.email}">${mla.email}</a> <span style="color:#64748b; font-size:0.9em;"></span>`
         : `<a href="mailto:${mla.email}">${mla.email}</a>`;
 
       // Handle optional toll-free number (With phone link and emoji)

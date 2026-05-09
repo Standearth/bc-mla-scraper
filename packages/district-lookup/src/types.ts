@@ -49,4 +49,5 @@ export interface LookupConfig {
   returnRawGoogle?: boolean;
   returnRawMla?: boolean;
   onSelect?: (data: ValidatedAddress) => void;
+  onClear?: () => void;
 }

@@ -74,3 +74,37 @@
   font-size: 0.75em;
   white-space: nowrap;
 }
+
+.district-lookup-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Make sure the input text doesn't flow underneath the clear button */
+.district-lookup-wrapper input[type="text"] {
+  padding-right: 40px !important;
+}
+
+.district-lookup-clear {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  user-select: none;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.district-lookup-clear:hover {
+  color: #334155;
+  background-color: #f1f5f9;
+}

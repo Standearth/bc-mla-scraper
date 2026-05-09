@@ -12,6 +12,7 @@ export class LookupWidget {
   private currentResults: AzureElectoralResult[] = [];
   private activeIndex: number = -1;
   private originalInputText: string = "";
+  private clearButton: HTMLSpanElement;
 
   constructor(
     inputSelector: string | HTMLInputElement,
@@ -34,10 +35,17 @@ export class LookupWidget {
     this.dropdownElement = document.createElement("ul");
     this.dropdownElement.className = "district-lookup-dropdown";
 
+    // Create the clear button
+    this.clearButton = document.createElement("span");
+    this.clearButton.className = "district-lookup-clear";
+    this.clearButton.innerHTML = "&times;";
+    this.clearButton.style.display = "none";
+
     const wrapper = document.createElement("div");
     wrapper.className = "district-lookup-wrapper";
     this.inputElement.parentNode?.insertBefore(wrapper, this.inputElement);
     wrapper.appendChild(this.inputElement);
+    wrapper.appendChild(this.clearButton); // Add the clear button here
     wrapper.appendChild(this.dropdownElement);
 
     this.bindEvents();
@@ -60,6 +68,15 @@ export class LookupWidget {
         this.originalInputText = query;
         this.activeIndex = -1;
 
+        // Toggle 'x' button visibility
+        this.clearButton.style.display = query.length > 0 ? "flex" : "none";
+
+        if (query.trim() === "") {
+          this.currentResults = [];
+          this.dropdownElement.style.display = "none";
+          return;
+        }
+
         const results = await this.api.searchAddress(query);
         this.currentResults = results || [];
         this.renderDropdown(this.currentResults);
@@ -79,9 +96,20 @@ export class LookupWidget {
     this.inputElement.addEventListener("keydown", (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        this.inputElement.value = this.originalInputText;
-        this.dropdownElement.style.display = "none";
-        this.activeIndex = -1;
+        const isOpen = this.dropdownElement.style.display === "block";
+
+        if (isOpen) {
+          // First Escape: Revert to typed text and close dropdown
+          this.inputElement.value = this.originalInputText;
+          this.dropdownElement.style.display = "none";
+          this.activeIndex = -1;
+        } else {
+          // Second Escape (Dropdown closed): Clear the field completely
+          this.inputElement.value = "";
+          this.originalInputText = "";
+          this.currentResults = [];
+          this.clearButton.style.display = "none";
+        }
         return;
       }
 
@@ -137,6 +165,18 @@ export class LookupWidget {
     document.addEventListener("click", (e) => {
       if (!this.inputElement.parentElement?.contains(e.target as Node)) {
         this.dropdownElement.style.display = "none";
+      }
+    });
+
+    this.clearButton.addEventListener("click", () => {
+      this.inputElement.value = "";
+      this.originalInputText = "";
+      this.currentResults = [];
+      this.dropdownElement.style.display = "none";
+      this.clearButton.style.display = "none";
+      this.inputElement.focus();
+      if (this.config.onClear) {
+        this.config.onClear();
       }
     });
   }
