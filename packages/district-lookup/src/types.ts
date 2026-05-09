@@ -22,6 +22,7 @@ export interface ValidatedAddress {
   coordinates: { lat: number; lng: number };
   isGoogleValidated: boolean;
   rawAzureData: AzureElectoralResult;
+  rawGoogleData?: any;
 }
 
 export interface LookupConfig {

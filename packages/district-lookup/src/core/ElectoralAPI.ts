@@ -133,6 +133,8 @@ export class ElectoralAPI {
       if (!response.ok) throw new Error("Google Validation API Error");
       const data = await response.json();
 
+      baseResult.rawGoogleData = data;
+
       const postalCodeComponent =
         data.result?.address?.postalAddress?.postalCode;
 
