@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=82.0.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,12 +7,12 @@ name = "bc-mla-scraper"
 version = "1.0.0"
 description = "A scraper module to retrieve and format active MLA data from the British Columbia Legislature."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.14"
 authors = [
     { name = "Matthew Carroll" }
 ]
 dependencies = [
-    "requests>=2.25.0"
+    "requests>=2.33.1"
 ]
 
 [project.scripts]
@@ -21,7 +21,7 @@ bc-mla-en = "engaging_networks:main"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0"
+    "pytest>=9.0.3"
 ]
 
 [tool.setuptools]

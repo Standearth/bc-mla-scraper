@@ -1,7 +1,13 @@
 # --- Variables ---
-PUBLIC_DIR := public
+PUBLIC_DIR  := public
 SCRAPER_PKG := packages/scraper
-LOOKUP_PKG := packages/district-lookup
+LOOKUP_PKG  := packages/district-lookup
+GEO_PKG     := packages/geo-processor
+
+ED_GEOJSON_IN  := data/BCGW_02001F02_1778300296741_14604.zip
+ED_GEOJSON_OUT := public/bc_electoral_districts.geojson
+TOLERANCE      ?= 0.001
+
 
 # --- Development ---
 
@@ -32,6 +38,7 @@ install:
 	@echo "Installing all dependencies..."
 	cd $(LOOKUP_PKG) && npm install
 	pip install -e $(SCRAPER_PKG)
+	pip install -e $(GEO_PKG)
 
 .PHONY: test
 test:
@@ -40,6 +47,11 @@ test:
 	pytest $(SCRAPER_PKG)
 	@echo "--- TypeScript ---"
 	cd $(LOOKUP_PKG) && npm run test
+
+.PHONY: process-geo
+process-geo:
+	@echo "Simplifying Electoral Boundaries (tolerance: $(TOLERANCE))..."
+	simplify-geojson $(ED_GEOJSON_IN) -o $(ED_GEOJSON_OUT) -t $(TOLERANCE)
 
 .PHONY: help
 help:
