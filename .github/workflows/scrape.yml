@@ -1,0 +1,39 @@
+name: Nightly Data Scraper
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write # Needed to push data back to the repo
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Run Python Scraper
+        working-directory: packages/scraper
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          bc-mla-scraper --csv ../../public/bc_mlas.csv --json ../../public/bc_mlas.json
+
+      - name: Commit and push data changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/bc_mlas.csv public/bc_mlas.json
+
+          # Only commit and push if the scraper found new data
+          # Pushing here will automatically trigger deploy.yml!
+          git diff --staged --quiet || (git commit -m "Automated nightly data update" && git push)

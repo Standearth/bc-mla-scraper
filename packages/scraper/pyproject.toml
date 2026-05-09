@@ -24,5 +24,6 @@ dev = [
     "pytest>=7.0.0"
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = ["bc_mla_scraper", "engaging_networks", "formatters", "test_formatters"]
