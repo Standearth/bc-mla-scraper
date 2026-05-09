@@ -39,6 +39,7 @@ jobs:
           VITE_AZURE_VERSION: ${{ vars.VITE_AZURE_VERSION }}
           VITE_AZURE_KEY: ${{ secrets.VITE_AZURE_KEY }}
           VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
+          VITE_MLA_DATA_URL: ${{ vars.VITE_MLA_DATA_URL }}
         run: |
           npm ci
           npm run test
