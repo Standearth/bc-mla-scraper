@@ -142,3 +142,11 @@ Every night at 1:00 AM Pacific Time, the `deploy.yml` workflow:
 2. Runs the Python scraper to fetch the absolute latest MLA data from the BC Legislature.
 3. Commits any changes to the data back to the repository's `main` branch (for version control).
 4. Deploys the frontend tools and the updated CSV/JSON data to GitHub Pages via the `public/` folder.
+
+---
+
+## Acknowledgements
+
+This project was built for [Stand.earth](https://stand.earth) by [Matthew Carroll](https://github.com/mfcarroll).
+
+Contains information licenced under the [Elections BC Open Data Licence](https://www.elections.bc.ca/docs/EBC-Open-Data-Licence.pdf).
