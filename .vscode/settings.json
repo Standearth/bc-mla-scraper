@@ -17,5 +17,10 @@
     }
   },
 
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true
+  },
+
   "python.analysis.extraPaths": ["./packages/scraper/src"]
 }
