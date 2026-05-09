@@ -1,13 +1,15 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default defineConfig({
+  plugins: [cssInjectedByJsPlugin()],
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "DistrictLookup", // Exposes the tool globally as window.DistrictLookup
+      name: "DistrictLookup",
       fileName: "district-lookup",
-      formats: ["iife"], // Immediately Invoked Function Expression (perfect for <script> tags)
+      formats: ["iife"],
     },
     outDir: "dist",
     emptyOutDir: true,

@@ -1,0 +1,76 @@
+.district-lookup-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.district-lookup-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.district-lookup-dropdown li {
+  padding: 8px 15px; /* Reduced vertical height */
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: system-ui, sans-serif;
+  gap: 12px;
+  transition: background-color 0.1s ease;
+}
+
+.district-lookup-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.district-lookup-dropdown li:hover,
+.district-lookup-dropdown li.active {
+  background-color: #e2e8f0;
+}
+
+.district-lookup-item-address {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.district-lookup-item-address svg {
+  flex-shrink: 0;
+}
+
+.district-lookup-item-address span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #4a5568;
+  font-size: 0.9em;
+  font-weight: 400;
+}
+
+.district-lookup-dropdown li small {
+  color: #4a5568;
+  background: #edf2f7;
+  border: 1px solid #cbd5e0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  font-weight: 500; /* Less bold (Medium) */
+  font-size: 0.75em;
+  white-space: nowrap;
+}
