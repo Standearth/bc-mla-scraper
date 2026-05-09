@@ -107,7 +107,7 @@ export class ElectoralAPI {
       postalCode: null,
       districtName: azureResult.ed_name,
       districtAbbr: azureResult.ed_abbr,
-      coordinates: { lat: azureResult.y, lng: azureResult.x },
+      coordinates: { lat: azureResult.y, lng: azureResult.x }, // Elections BC defaults
       isGoogleValidated: false,
       rawAzureData: azureResult,
     };
@@ -135,12 +135,26 @@ export class ElectoralAPI {
 
       baseResult.rawGoogleData = data;
 
+      // 1. Extract Postal Code
       const postalCodeComponent =
         data.result?.address?.postalAddress?.postalCode;
 
       if (postalCodeComponent) {
         baseResult.postalCode = postalCodeComponent;
         baseResult.isGoogleValidated = true;
+      }
+
+      // 2. Prioritize Google geocode coordinates if available
+      const googleLocation = data.result?.geocode?.location;
+      if (
+        googleLocation &&
+        googleLocation.latitude !== undefined &&
+        googleLocation.longitude !== undefined
+      ) {
+        baseResult.coordinates = {
+          lat: googleLocation.latitude,
+          lng: googleLocation.longitude,
+        };
       }
 
       return baseResult;
