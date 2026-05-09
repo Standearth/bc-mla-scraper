@@ -40,62 +40,133 @@ input[type="text"]:focus {
   margin-top: 20px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   display: none;
-  border-top: 5px solid #2b6cb0;
+  border-top: 5px solid #475569;
   overflow: hidden;
 }
 
 .card-header {
-  padding: 20px 20px 0 20px;
-}
-
-.district-badge {
-  display: inline-block;
-  background-color: #ebf8ff;
-  color: #2b6cb0;
-  padding: 6px 0;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  padding: 20px;
 }
 
 .address-output {
   font-size: 1.1rem;
   color: #1e293b;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  line-height: 1.25; /* Tighter line-height for cohesion */
 }
 
-/* Subdued JSON Section */
+/* --- LOWER SECTION: MLA Profile --- */
+.mla-output {
+  padding: 0 20px 20px 20px;
+  border-top: 1px solid #cbd5e1;
+  background-color: #f1f5f9; /* Distinct slate-grey background */
+  padding-top: 20px;
+}
+
+.district-header {
+  font-size: 1.2rem; /* Larger than before */
+  font-weight: 700;
+  color: #1e293b; /* Dark slate (not blue) */
+  margin-bottom: 18px;
+}
+
+.mla-profile {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.headshot {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 15%;
+  background-color: #eee;
+  border: 1px solid #cbd5e1;
+  flex-shrink: 0;
+}
+
+.mla-details {
+  flex: 1;
+}
+
+.mla-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.mla-name {
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 1.15rem;
+}
+
+.mla-name:hover {
+  text-decoration: underline;
+}
+
+.party-tag {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.mla-contact {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.mla-contact a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.mla-contact a:hover {
+  text-decoration: underline;
+}
+
+.address-block {
+  line-height: 1.25; /* Reduced line-height so it feels like one cohesive block */
+  margin-bottom: 4px;
+}
+
+/* --- DEVELOPER RAW JSON SECTION --- */
 details {
-  background-color: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #cbd5e1;
 }
 
 summary {
+  background-color: #e2e8f0;
   padding: 15px 20px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #64748b;
+  color: #0f172a;
   user-select: none;
+  transition: background-color 0.2s ease;
 }
 
 summary:hover {
-  background-color: #f1f5f9;
+  background-color: #cbd5e1;
 }
 
 pre {
-  background-color: #1e293b;
+  background-color: #0f172a;
   color: #e2e8f0;
   padding: 20px;
   margin: 0;
   overflow-x: auto;
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #334155;
 }
