@@ -18,6 +18,7 @@ DEFAULT_JSON_FILE = "bc_mlas.json"
 # Dynamically calculate the root of the repository (src -> scraper -> packages -> bc-mla-tools)
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 DEFAULT_MAPPING_FILE = os.path.join(ROOT_DIR, "public", "district_codes.json")
+DEFAULT_TITLES_FILE = os.path.join(ROOT_DIR, "data", "bc_mla_titles.csv")
 
 
 class MLAScraper:
@@ -34,13 +35,13 @@ class MLAScraper:
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
-    def __init__(self, mapping_file_path=None):
+    def __init__(
+        self,
+        mapping_file_path=DEFAULT_MAPPING_FILE,
+        titles_file_path=DEFAULT_TITLES_FILE,
+    ):
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
-
-        # Fallback to the default if no path is explicitly provided
-        if mapping_file_path is None:
-            mapping_file_path = DEFAULT_MAPPING_FILE
 
         # Load the district code mappings into memory
         self.district_codes = {}
@@ -52,6 +53,18 @@ class MLAScraper:
             print(
                 "Run 'make process-geo' first to generate it. District codes will be blank."
             )
+
+        # Load the manual prefix overrides into memory
+        self.titles_mapping = {}
+        if titles_file_path and os.path.exists(titles_file_path):
+            with open(titles_file_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    key = (
+                        row.get("firstName", "").strip(),
+                        row.get("lastName", "").strip(),
+                    )
+                    self.titles_mapping[key] = row.get("prefix", "").strip()
 
     def get_current_parliament_info(self):
         """Fetches the ID and annotation (e.g. 'rd', 'th') of the currently active parliament."""
@@ -225,6 +238,14 @@ class MLAScraper:
                 party.get("name", ""), party.get("abbreviation", "")
             )
 
+            prefix = member.get("prefix", "")
+            prefix_clean = prefix
+
+            # Check for a manual override using first and last name
+            override_key = (first_name.strip(), last_name.strip())
+            if override_key in self.titles_mapping:
+                prefix_clean = self.titles_mapping[override_key]
+
             # Clean up em-dashes to match standard hyphens often found in GeoJSON
             normalized_name = constituency_name.replace("—", "-")
 
@@ -242,7 +263,8 @@ class MLAScraper:
                 {
                     "districtCode": district_code,
                     "constituencyName": constituency_name,
-                    "prefix": member.get("prefix", ""),
+                    "prefix": prefix,
+                    "prefixClean": prefix_clean,
                     "firstName": first_name,
                     "lastName": last_name,
                     "email": member.get("legislativeEmail", ""),
@@ -347,13 +369,18 @@ def main():
         default=DEFAULT_MAPPING_FILE,
         help="Path to the JSON file mapping district codes to names.",
     )
+    parser.add_argument(
+        "--titles",
+        default=DEFAULT_TITLES_FILE,
+        help="Path to the CSV file containing manual prefix overrides.",
+    )
     args = parser.parse_args()
 
     if not args.csv and not args.json:
         args.csv = DEFAULT_CSV_FILE
 
     print("Initializing scraper...")
-    scraper = MLAScraper(mapping_file_path=args.mapping)
+    scraper = MLAScraper(mapping_file_path=args.mapping, titles_file_path=args.titles)
 
     print("Fetching active MLA data...")
     try:

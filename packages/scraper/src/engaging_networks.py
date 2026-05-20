@@ -45,7 +45,7 @@ def process_for_engaging_networks(mlas):
 
     for mla in mlas:
         # Determine Title (Fallback to prefix)
-        title = mla.get("isDoctorClean") or mla.get("prefix", "")
+        title = mla.get("isDoctorClean") or mla.get("prefixClean", "")
 
         # Recombine the street and PO Box
         street = mla.get("conOfficeAddressCleanStreet", "")
