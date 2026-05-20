@@ -38,6 +38,7 @@ coverage/
 # Ignore output files
 /*.csv
 /*.json
+/*.txt
 
 # Allow hosted data
 !public/bc_mlas.csv

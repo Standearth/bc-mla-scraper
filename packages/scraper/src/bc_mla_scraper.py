@@ -38,6 +38,10 @@ class MLAScraper:
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
 
+        # Fallback to the default if no path is explicitly provided
+        if mapping_file_path is None:
+            mapping_file_path = DEFAULT_MAPPING_FILE
+
         # Load the district code mappings into memory
         self.district_codes = {}
         if mapping_file_path and os.path.exists(mapping_file_path):

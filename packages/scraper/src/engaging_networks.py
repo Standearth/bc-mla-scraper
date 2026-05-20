@@ -19,7 +19,7 @@ Conversion Specification:
 6. Phone Number: Uses Constituency Toll-Free phone if present, otherwise Constituency Local phone.
    - Formats to standard North American style: (XXX) YYY-ZZZZ
 7. Organization: Populated with the Constituency Name.
-8. Biography 1 (Constituency ID): Populated with the Constituency ID (Used for Matching).
+8. Biography 1 (Constituency ID): Populated with the 3-letter Constituency Code (Used for Matching).
 9. Biography 2 (Postal Code): Constituency Office Postal Code.
 10. X Handle (Ministry Email): Populated with the member's ministry email address.
 11. Biography 4 (Roles): Populated with the member's roles/ministries.
@@ -72,7 +72,7 @@ def process_for_engaging_networks(mlas):
             "Phone Number": phone,
             "Title": title,
             "Organization": mla.get("constituencyName", ""),
-            "Biography 1 (Constituency ID)": str(mla.get("constituencyId", "")),
+            "Biography 1 (Constituency ID)": str(mla.get("districtCode", "")),
             "Biography 2 (Postal Code)": mla.get("conOfficePostalCode", ""),
             "X Handle (Ministry Email)": mla.get("ministryEmail", ""),
             "Biography 4 (Roles)": mla.get("roles", ""),
@@ -100,6 +100,28 @@ def export_to_csv(rows, filename):
         writer.writerows(rows)
 
     print(f"Data successfully saved to {filename}")
+
+
+def export_select_field(raw_mlas, filename):
+    """Writes a text file formatted for Engaging Networks select fields (label~value)."""
+    if not raw_mlas:
+        return
+
+    # Use a dictionary to get unique district code -> name pairs
+    districts = {}
+    for mla in raw_mlas:
+        code = mla.get("districtCode")
+        name = mla.get("constituencyName")
+        if code and name:
+            districts[code] = name
+
+    # Write to text file
+    with open(filename, mode="w", encoding="utf-8") as file:
+        # Sort by the 3-letter code alphabetically
+        for code in sorted(districts.keys()):
+            file.write(f"{districts[code]}~{code}\n")
+
+    print(f"Select field format successfully saved to {filename}")
 
 
 def main():
@@ -136,6 +158,15 @@ def main():
 
     # Use the parsed argument for the file export
     export_to_csv(en_mlas, args.output)
+
+    # Figure out the select output filename (e.g., bc_mlas_en_20260519_select.txt)
+    if args.output.endswith(".csv"):
+        select_filename = args.output.replace(".csv", "_select.txt")
+    else:
+        select_filename = f"{args.output}_select.txt"
+
+    # Export the text file using the raw data (which has the districtCode)
+    export_select_field(raw_mlas, select_filename)
 
 
 if __name__ == "__main__":
