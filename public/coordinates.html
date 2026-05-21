@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coordinate District Lookup</title>
+    <link rel="stylesheet" href="lookup.css" />
+    <link rel="stylesheet" href="coordinates.css" />
+  </head>
+  <body>
+    <div class="bcdl-app-container">
+      <div class="bcdl-app-header">
+        <h2 style="margin-bottom: 0">Coordinate Lookup</h2>
+        <a href="index.html" class="bcdl-btn-nav">🏛️ View Directory</a>
+      </div>
+
+      <div
+        id="status-message"
+        style="color: #64748b; font-style: italic; margin-bottom: 15px"
+      >
+        Loading boundary data...
+      </div>
+
+      <div class="bcdl-control-panel">
+        <label style="font-weight: 600; font-size: 0.95em; color: #1e293b"
+          >Enter Coordinates:</label
+        >
+        <div class="bcdl-coord-form">
+          <input
+            type="number"
+            id="lat-input"
+            class="bcdl-coord-input"
+            placeholder="Latitude (e.g. 48.4196)"
+            step="any"
+          />
+          <input
+            type="number"
+            id="lng-input"
+            class="bcdl-coord-input"
+            placeholder="Longitude (e.g. -123.3702)"
+            step="any"
+          />
+        </div>
+
+        <div class="bcdl-sample-links">
+          Try a sample:
+          <a href="#" id="sample-leg">🏛️ BC Legislature</a>
+          <a href="#" id="sample-van">🏙️ Vancouver City Hall</a>
+          <a href="#" id="sample-pg">🌲 Prince George</a>
+        </div>
+
+        <div class="bcdl-actions-row">
+          <button id="btn-lookup" class="bcdl-btn-nav" disabled>
+            🔍 Search Coordinates
+          </button>
+          <span class="bcdl-or-divider">OR</span>
+          <button id="btn-geolocation" class="bcdl-btn-nav" disabled>
+            📍 Use My Location
+          </button>
+        </div>
+      </div>
+
+      <div id="result-card" class="bcdl-result-card" style="display: none">
+        <div class="bcdl-card-header">
+          <div id="address-output" class="bcdl-address-output"></div>
+        </div>
+
+        <div id="mla-output" class="bcdl-mla-output"></div>
+      </div>
+    </div>
+
+    <script src="district-lookup.js"></script>
+    <script src="coordinates.js"></script>
+  </body>
+</html>

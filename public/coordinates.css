@@ -1,0 +1,75 @@
+/* --- Coordinate Control Panel --- */
+.bcdl-control-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Coordinate Inputs --- */
+.bcdl-coord-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.bcdl-coord-input {
+  padding: 12px;
+  border: 1px solid var(--bcdl-border-color, #ccc);
+  border-radius: 6px;
+  flex: 1;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.bcdl-coord-input:focus {
+  border-color: #2b6cb0;
+}
+
+/* --- Sample Links --- */
+.bcdl-sample-links {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #64748b;
+}
+
+.bcdl-sample-links a {
+  color: #0066cc;
+  text-decoration: none;
+  margin-right: 15px;
+  font-weight: 500;
+  transition: text-decoration 0.2s;
+}
+
+.bcdl-sample-links a:hover {
+  text-decoration: underline;
+}
+
+/* --- Action Buttons Row --- */
+.bcdl-actions-row {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.bcdl-or-divider {
+  color: #64748b;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+/* --- Button Specific Overrides --- */
+/* Ensure standard <button> elements visually match standard <a> tags using the .bcdl-btn-nav class */
+button.bcdl-btn-nav {
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button.bcdl-btn-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
