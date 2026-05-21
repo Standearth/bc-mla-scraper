@@ -25,7 +25,7 @@ build:
 scrape:
 	@echo "Running Python Scraper..."
 	# Assumes your venv is active or package is installed
-	bc-mla-scraper --csv $(PUBLIC_DIR)/bc_mlas.csv --json $(PUBLIC_DIR)/bc_mlas.json
+	bc-mla-scraper --csv $(PUBLIC_DIR)/bc_mlas.csv --json $(PUBLIC_DIR)/bc_mlas.json --mapping $(PUBLIC_DIR)/district_codes.json --titles data/bc_mla_titles.csv
 
 # --- Combined Commands ---
 
