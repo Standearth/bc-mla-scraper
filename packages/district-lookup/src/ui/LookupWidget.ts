@@ -32,19 +32,16 @@ export class LookupWidget extends HTMLElement {
   connectedCallback() {
     const placeholder = this.getAttribute("placeholder") || "";
 
-    // Inject the component's internal HTML (using Light DOM so existing CSS still applies)
     this.innerHTML = `
-      <div class="district-lookup-wrapper">
-        <input type="text" class="district-lookup-input" placeholder="${placeholder}" autocomplete="off" />
-        <span class="district-lookup-clear" style="display: none;">&times;</span>
-        <ul class="district-lookup-dropdown" style="display: none;"></ul>
+      <div class="bcdl-wrapper">
+        <input type="text" class="bcdl-input" placeholder="${placeholder}" autocomplete="off" />
+        <span class="bcdl-clear" style="display: none;">&times;</span>
+        <ul class="bcdl-dropdown" style="display: none;"></ul>
       </div>
     `;
 
     this.inputElement = this.querySelector("input") as HTMLInputElement;
-    this.clearButton = this.querySelector(
-      ".district-lookup-clear",
-    ) as HTMLSpanElement;
+    this.clearButton = this.querySelector(".bcdl-clear") as HTMLSpanElement;
     this.dropdownElement = this.querySelector("ul") as HTMLUListElement;
 
     this.bindEvents();

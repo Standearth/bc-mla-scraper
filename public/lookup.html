@@ -7,24 +7,24 @@
     <link rel="stylesheet" href="lookup.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="header-row">
+    <div class="bcdl-app-container">
+      <div class="bcdl-app-header">
         <h2 style="margin-bottom: 0">Find Your Electoral District</h2>
-        <a href="index.html" class="btn-nav">🏛️ View Directory</a>
+        <a href="index.html" class="bcdl-btn-nav">🏛️ View Directory</a>
       </div>
 
       <bc-district-lookup
-        id="address-lookup"
+        id="district-lookup"
         placeholder="Start typing your BC address..."
       >
       </bc-district-lookup>
 
-      <div id="result-card" class="result-card" style="display: none">
-        <div class="card-header">
-          <div id="address-output" class="address-output"></div>
+      <div id="result-card" class="bcdl-result-card" style="display: none">
+        <div class="bcdl-card-header">
+          <div id="address-output" class="bcdl-address-output"></div>
         </div>
 
-        <div id="mla-output" class="mla-output"></div>
+        <div id="mla-output" class="bcdl-mla-output"></div>
 
         <details>
           <summary>View Raw API Data</summary>

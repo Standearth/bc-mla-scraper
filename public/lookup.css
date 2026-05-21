@@ -9,138 +9,27 @@ body {
   padding-top: 50px;
 }
 
-.container {
-  width: 100%;
-  max-width: 600px;
-  padding: 0 15px;
-}
-
 h2 {
   margin-bottom: 20px;
   color: #1a365d;
 }
 
-input[type="text"] {
+/* --- APP LAYOUT --- */
+.bcdl-app-container {
   width: 100%;
-  padding: 15px;
-  font-size: 16px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
-  outline: none;
-  transition: border-color 0.2s;
+  max-width: 600px;
+  padding: 0 15px;
 }
 
-input[type="text"]:focus {
-  border-color: #2b6cb0;
-}
-
-/* Stylish Output Card */
-.result-card {
-  margin-top: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  display: none;
-  border-top: 5px solid #475569;
-  overflow: hidden;
-}
-
-.card-header {
-  padding: 20px;
-}
-
-.address-output {
-  font-size: 1.1rem;
-  color: #1e293b;
-  line-height: 1.25; /* Tighter line-height for cohesion */
-}
-
-/* --- LOWER SECTION: MLA Profile --- */
-.mla-output {
-  padding: 0 20px 20px 20px;
-  border-top: 1px solid #cbd5e1;
-  background-color: #f1f5f9; /* Distinct slate-grey background */
-  padding-top: 20px;
-}
-
-.district-header {
-  font-size: 1.2rem; /* Larger than before */
-  font-weight: 700;
-  color: #1e293b; /* Dark slate (not blue) */
-  margin-bottom: 18px;
-}
-
-.mla-profile {
-  display: flex;
-  gap: 15px;
-  align-items: flex-start;
-}
-
-.headshot {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center 15%;
-  background-color: #eee;
-  border: 1px solid #cbd5e1;
-  flex-shrink: 0;
-}
-
-.mla-details {
-  flex: 1;
-}
-
-.mla-header {
+.bcdl-app-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 1rem;
 }
 
-.mla-name {
-  color: #0066cc;
-  text-decoration: none;
-  font-size: 1.15rem;
-}
-
-.mla-name:hover {
-  text-decoration: underline;
-}
-
-.party-tag {
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 700;
-  color: white;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.mla-contact {
-  font-size: 0.95rem;
-  color: #334155;
-  line-height: 1.5;
-}
-
-.mla-contact a {
-  color: #0066cc;
-  text-decoration: none;
-}
-
-.mla-contact a:hover {
-  text-decoration: underline;
-}
-
-.address-block {
-  line-height: 1.25; /* Reduced line-height so it feels like one cohesive block */
-  margin-bottom: 4px;
-}
-
-.btn-nav {
+.bcdl-btn-nav {
   display: inline-flex;
   align-items: center;
   background-color: #e2e8f0;
@@ -153,24 +42,122 @@ input[type="text"]:focus {
   transition: background-color 0.2s;
   white-space: nowrap;
 }
-.btn-nav:hover {
+
+.bcdl-btn-nav:hover {
   background-color: #cbd5e1;
 }
 
-.header-row {
+/* --- OUTPUT CARD OVERALL --- */
+.bcdl-result-card {
+  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: none;
+  border-top: 5px solid #475569;
+  overflow: hidden;
+}
+
+.bcdl-card-header {
+  padding: 20px;
+}
+
+.bcdl-address-output {
+  font-size: 1.1rem;
+  color: #1e293b;
+  line-height: 1.25;
+}
+
+/* --- LOWER SECTION: MLA Profile --- */
+.bcdl-mla-output {
+  padding: 0 20px 20px 20px;
+  border-top: 1px solid #cbd5e1;
+  background-color: #f1f5f9;
+  padding-top: 20px;
+}
+
+.bcdl-district-header {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 18px;
+}
+
+.bcdl-mla-profile {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.bcdl-headshot {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 15%;
+  background-color: #eee;
+  border: 1px solid #cbd5e1;
+  flex-shrink: 0;
+}
+
+.bcdl-mla-details {
+  flex: 1;
+}
+
+.bcdl-mla-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.bcdl-mla-name {
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 1.15rem;
+}
+
+.bcdl-mla-name:hover {
+  text-decoration: underline;
+}
+
+.bcdl-party-tag {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.bcdl-mla-contact {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.bcdl-mla-contact a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.bcdl-mla-contact a:hover {
+  text-decoration: underline;
+}
+
+.bcdl-address-block {
+  line-height: 1.25;
+  margin-bottom: 4px;
 }
 
 /* --- DEVELOPER RAW JSON SECTION --- */
-details {
+.bcdl-result-card details {
   border-top: 1px solid #cbd5e1;
 }
 
-summary {
+.bcdl-result-card summary {
   background-color: #e2e8f0;
   padding: 15px 20px;
   cursor: pointer;
@@ -181,11 +168,11 @@ summary {
   transition: background-color 0.2s ease;
 }
 
-summary:hover {
+.bcdl-result-card summary:hover {
   background-color: #cbd5e1;
 }
 
-pre {
+.bcdl-result-card pre {
   background-color: #0f172a;
   color: #e2e8f0;
   padding: 20px;

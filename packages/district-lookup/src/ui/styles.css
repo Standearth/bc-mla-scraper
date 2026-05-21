@@ -1,110 +1,109 @@
-.district-lookup-wrapper {
+/* Base Web Component Styling */
+bc-district-lookup {
+  /* CSS Variables for easy developer overriding */
+  --bcdl-border-color: #e2e8f0;
+  --bcdl-border-focus: #3b82f6;
+  --bcdl-text-primary: #1e293b;
+  --bcdl-text-secondary: #64748b;
+  --bcdl-bg-primary: #ffffff;
+  --bcdl-bg-hover: #f1f5f9;
+  --bcdl-radius: 8px;
+  --bcdl-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  display: block;
+  font-family: inherit; /* Inherit the host site's font! */
   position: relative;
   width: 100%;
 }
 
-.district-lookup-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.district-lookup-dropdown li {
-  padding: 8px 15px; /* Reduced vertical height */
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: system-ui, sans-serif;
-  gap: 12px;
-  transition: background-color 0.1s ease;
-}
-
-.district-lookup-dropdown li:last-child {
-  border-bottom: none;
-}
-
-.district-lookup-dropdown li:hover,
-.district-lookup-dropdown li.active {
-  background-color: #e2e8f0;
-}
-
-.district-lookup-item-address {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow: hidden;
-}
-
-.district-lookup-item-address svg {
-  flex-shrink: 0;
-}
-
-.district-lookup-item-address span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #4a5568;
-  font-size: 0.9em;
-  font-weight: 400;
-}
-
-.district-lookup-dropdown li small {
-  color: #4a5568;
-  background: #edf2f7;
-  border: 1px solid #cbd5e0;
-  padding: 4px 8px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  font-weight: 500; /* Less bold (Medium) */
-  font-size: 0.75em;
-  white-space: nowrap;
-}
-
-.district-lookup-wrapper {
+.bcdl-wrapper {
   position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
 }
 
-/* Make sure the input text doesn't flow underneath the clear button */
-.district-lookup-wrapper input[type="text"] {
-  padding-right: 40px !important;
+.bcdl-input {
+  width: 100%;
+  padding: 12px 35px 12px 12px;
+  font-size: 16px;
+  border: 1px solid var(--bcdl-border-color);
+  border-radius: var(--bcdl-radius);
+  box-sizing: border-box;
+  background-color: var(--bcdl-bg-primary);
+  color: var(--bcdl-text-primary);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
-.district-lookup-clear {
+.bcdl-input:focus {
+  outline: none;
+  border-color: var(--bcdl-border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.bcdl-clear {
   position: absolute;
   right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
-  font-size: 1.5rem;
-  color: #94a3b8;
+  color: var(--bcdl-text-secondary);
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
-  line-height: 1;
-  user-select: none;
-  border-radius: 50%;
-  transition: all 0.2s;
 }
 
-.district-lookup-clear:hover {
-  color: #334155;
-  background-color: #f1f5f9;
+.bcdl-clear:hover {
+  color: var(--bcdl-text-primary);
+}
+
+.bcdl-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  margin-bottom: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--bcdl-bg-primary);
+  border: 1px solid var(--bcdl-border-color);
+  border-radius: var(--bcdl-radius);
+  box-shadow: var(--bcdl-shadow);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.bcdl-dropdown li {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bcdl-border-color);
+  color: var(--bcdl-text-primary);
+}
+
+.bcdl-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.bcdl-dropdown li:hover,
+.bcdl-dropdown li.active {
+  background-color: var(--bcdl-bg-hover);
+}
+
+.bcdl-item-address {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.bcdl-dropdown small {
+  color: var(--bcdl-text-secondary);
+  display: block;
+  margin-left: 26px; /* align with text, bypassing icon */
 }

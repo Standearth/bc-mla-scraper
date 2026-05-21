@@ -6,7 +6,7 @@ const PARTY_COLORS = {
 };
 
 // Target the new Web Component
-const lookupWidget = document.getElementById("address-lookup");
+const lookupWidget = document.getElementById("district-lookup");
 
 // Set config properties
 lookupWidget.config = {
@@ -71,37 +71,37 @@ lookupWidget.addEventListener("district-selected", (e) => {
       : "N/A";
 
     mlaHtml = `
-      <div class="district-header">Electoral District: ${data.districtName}</div>
-      
-      <div class="mla-profile">
-        <img src="${mla.imagePath}" class="headshot" alt="${mla.firstName} ${mla.lastName}">
-        <div class="mla-details">
-          <div class="mla-header">
-            <a href="${mla.profileUrl}" target="_blank" class="mla-name">
-              <strong>${mla.firstName} ${mla.lastName}</strong>
-            </a>
-            <span class="party-tag" style="background-color: ${partyColor};">${partyLabel}</span>
-          </div>
-          
-          <div class="mla-contact">
-            ${emailHtml}
+        <div class="bcdl-district-header">Electoral District: ${data.districtName}</div>
+        
+        <div class="bcdl-mla-profile">
+          <img src="${mla.imagePath}" class="bcdl-headshot" alt="${mla.firstName} ${mla.lastName}">
+          <div class="bcdl-mla-details">
+            <div class="bcdl-mla-header">
+              <a href="${mla.profileUrl}" target="_blank" class="bcdl-mla-name">
+                <strong>${mla.firstName} ${mla.lastName}</strong>
+              </a>
+              <span class="bcdl-party-tag" style="background-color: ${partyColor};">${partyLabel}</span>
+            </div>
             
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
-              <div style="font-size: 0.85em; color: #64748b; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Constituency Office</div>
-              <div class="address-block">
-                ${formattedStreetLine}<br>
-                ${mla.conOfficeCity}, BC<br>
-                ${mla.conOfficePostalCode}
-              </div>
+            <div class="bcdl-mla-contact">
+              ${emailHtml}
               
-              <div style="margin-top: 8px;">
-                ${phoneHtml}${tollFreeHtml}
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
+                <div style="font-size: 0.85em; color: #64748b; margin-bottom: 4px; font-weight: 600; text-transform: uppercase;">Constituency Office</div>
+                <div class="bcdl-address-block">
+                  ${formattedStreetLine}<br>
+                  ${mla.conOfficeCity}, BC<br>
+                  ${mla.conOfficePostalCode}
+                </div>
+                
+                <div style="margin-top: 8px;">
+                  ${phoneHtml}${tollFreeHtml}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
   } else {
     mlaHtml = `
        <div class="district-header">Electoral District: ${data.districtName}</div>
