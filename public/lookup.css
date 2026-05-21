@@ -1,3 +1,20 @@
+/* --- COMPONENT RESET --- */
+bc-district-lookup,
+:host {
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: left;
+  display: block;
+}
+
+/* Also protect the inputs/dropdowns inside the widget from inheriting giant text */
+bc-district-lookup input,
+bc-district-lookup select,
+:host input,
+:host select {
+  font-size: 16px;
+}
+
 /* --- APP LAYOUT --- */
 .bcdl-app-container {
   width: 100%;
