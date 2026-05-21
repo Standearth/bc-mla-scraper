@@ -2,51 +2,50 @@ import { ElectoralAPI } from "../core/ElectoralAPI";
 import type { LookupConfig, AzureElectoralResult } from "../types";
 import "./styles.css";
 
-export class LookupWidget {
-  private inputElement: HTMLInputElement;
-  private dropdownElement: HTMLUListElement;
-  private api: ElectoralAPI;
-  private config: LookupConfig;
+export class LookupWidget extends HTMLElement {
+  private inputElement!: HTMLInputElement;
+  private dropdownElement!: HTMLUListElement;
+  private api!: ElectoralAPI;
+  private _config: LookupConfig = {};
 
   // Track state for keyboard accessibility
   private currentResults: AzureElectoralResult[] = [];
   private activeIndex: number = -1;
   private originalInputText: string = "";
-  private clearButton: HTMLSpanElement;
+  private clearButton!: HTMLSpanElement;
 
-  constructor(
-    inputSelector: string | HTMLInputElement,
-    config: LookupConfig = {},
-  ) {
-    this.config = config;
-    this.api = new ElectoralAPI(config);
+  constructor() {
+    super();
+    this.api = new ElectoralAPI(this._config);
+  }
 
-    const el =
-      typeof inputSelector === "string"
-        ? document.querySelector(inputSelector)
-        : inputSelector;
-    if (!el || !(el instanceof HTMLInputElement)) {
-      throw new Error(
-        `DistrictLookup: Could not find input element for selector: ${inputSelector}`,
-      );
-    }
-    this.inputElement = el;
+  // Allow consumers to set config parameters (like API keys)
+  set config(val: LookupConfig) {
+    this._config = val;
+    this.api = new ElectoralAPI(val);
+  }
 
-    this.dropdownElement = document.createElement("ul");
-    this.dropdownElement.className = "district-lookup-dropdown";
+  get config() {
+    return this._config;
+  }
 
-    // Create the clear button
-    this.clearButton = document.createElement("span");
-    this.clearButton.className = "district-lookup-clear";
-    this.clearButton.innerHTML = "&times;";
-    this.clearButton.style.display = "none";
+  connectedCallback() {
+    const placeholder = this.getAttribute("placeholder") || "";
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "district-lookup-wrapper";
-    this.inputElement.parentNode?.insertBefore(wrapper, this.inputElement);
-    wrapper.appendChild(this.inputElement);
-    wrapper.appendChild(this.clearButton); // Add the clear button here
-    wrapper.appendChild(this.dropdownElement);
+    // Inject the component's internal HTML (using Light DOM so existing CSS still applies)
+    this.innerHTML = `
+      <div class="district-lookup-wrapper">
+        <input type="text" class="district-lookup-input" placeholder="${placeholder}" autocomplete="off" />
+        <span class="district-lookup-clear" style="display: none;">&times;</span>
+        <ul class="district-lookup-dropdown" style="display: none;"></ul>
+      </div>
+    `;
+
+    this.inputElement = this.querySelector("input") as HTMLInputElement;
+    this.clearButton = this.querySelector(
+      ".district-lookup-clear",
+    ) as HTMLSpanElement;
+    this.dropdownElement = this.querySelector("ul") as HTMLUListElement;
 
     this.bindEvents();
   }
@@ -163,7 +162,7 @@ export class LookupWidget {
 
     // 4. Close dropdown when clicking outside
     document.addEventListener("click", (e) => {
-      if (!this.inputElement.parentElement?.contains(e.target as Node)) {
+      if (!this.contains(e.target as Node)) {
         this.dropdownElement.style.display = "none";
       }
     });
@@ -175,8 +174,13 @@ export class LookupWidget {
       this.dropdownElement.style.display = "none";
       this.clearButton.style.display = "none";
       this.inputElement.focus();
-      if (this.config.onClear) {
-        this.config.onClear();
+
+      // Native Custom Event Broadcast
+      this.dispatchEvent(new CustomEvent("cleared"));
+
+      // Backwards compatibility if passing it via config
+      if (this._config.onClear) {
+        this._config.onClear();
       }
     });
   }
@@ -185,7 +189,6 @@ export class LookupWidget {
     items.forEach((li, index) => {
       if (index === this.activeIndex) {
         li.classList.add("active");
-
         li.scrollIntoView({ block: "nearest" });
 
         const item = this.currentResults[this.activeIndex];
@@ -230,7 +233,6 @@ export class LookupWidget {
 
       const li = document.createElement("li");
 
-      // Inject the Solid 18x18 Pointy Map Pin SVG
       li.innerHTML = `
         <div class="district-lookup-item-address">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="#718096" xmlns="http://www.w3.org/2000/svg">
@@ -268,8 +270,19 @@ export class LookupWidget {
 
     const finalData = await this.api.getValidatedDetails(item);
 
-    if (this.config.onSelect) {
-      this.config.onSelect(finalData);
+    // Native Custom Event Broadcast
+    this.dispatchEvent(
+      new CustomEvent("district-selected", { detail: finalData }),
+    );
+
+    // Backwards compatibility
+    if (this._config.onSelect) {
+      this._config.onSelect(finalData);
     }
   }
+}
+
+// Automatically register the component
+if (!customElements.get("bc-district-lookup")) {
+  customElements.define("bc-district-lookup", LookupWidget);
 }

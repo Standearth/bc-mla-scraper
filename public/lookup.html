@@ -13,14 +13,13 @@
         <a href="index.html" class="btn-nav">🏛️ View Directory</a>
       </div>
 
-      <input
-        type="text"
-        id="address-input"
+      <bc-district-lookup
+        id="address-lookup"
         placeholder="Start typing your BC address..."
-        autocomplete="off"
-      />
+      >
+      </bc-district-lookup>
 
-      <div id="result-card" class="result-card">
+      <div id="result-card" class="result-card" style="display: none">
         <div class="card-header">
           <div id="address-output" class="address-output"></div>
         </div>
