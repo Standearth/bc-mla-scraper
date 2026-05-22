@@ -134,7 +134,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mla = mlaData.find((m) => m.districtCode === districtAbbr);
 
     if (mla) {
-      const partyLabel = mla.partyAbbreviationClean || "Independent";
+      // UPDATED: partyAbbreviationClean -> partyAbbreviation
+      const partyLabel = mla.partyAbbreviation || "Independent";
       const partyColor =
         PARTY_COLORS[partyLabel] || PARTY_COLORS["Independent"];
 
@@ -143,24 +144,26 @@ document.addEventListener("DOMContentLoaded", async () => {
            <a href="mailto:${mla.email}">${mla.email}</a>`
         : `<a href="mailto:${mla.email}">${mla.email}</a>`;
 
-      const tollFreeHtml = mla.conOfficeTollFreeClean
-        ? `<br>📞 <a href="tel:${mla.conOfficeTollFree}">${mla.conOfficeTollFreeClean}</a> <span style="color:#64748b; font-size:0.9em;">(Toll Free)</span>`
+      // UPDATED: conOfficeTollFreeClean -> conOfficeTollFree, and conOfficeTollFree -> conOfficeTollFreeRaw
+      const tollFreeHtml = mla.conOfficeTollFree
+        ? `<br>📞 <a href="tel:${mla.conOfficeTollFreeRaw}">${mla.conOfficeTollFree}</a> <span style="color:#64748b; font-size:0.9em;">(Toll Free)</span>`
         : "";
 
-      const suiteStr = mla.conOfficeAddressCleanSuite
-        ? `${mla.conOfficeAddressCleanSuite}-`
-        : "";
+      // UPDATED: conOfficeAddressCleanSuite -> conOfficeSuite
+      const suiteStr = mla.conOfficeSuite ? `${mla.conOfficeSuite}-` : "";
+
+      // UPDATED: conOfficeAddressCleanStreet -> conOfficeStreet, conOfficeAddress -> conOfficeAddressRaw
       const streetStr =
-        mla.conOfficeAddressCleanStreet ||
-        mla.conOfficeAddress ||
+        mla.conOfficeStreet ||
+        mla.conOfficeAddressRaw ||
         "Address not available";
       const formattedStreetLine = `${suiteStr}${streetStr}`;
 
-      const phoneHtml = mla.conOfficePhoneClean
-        ? `📞 <a href="tel:${mla.conOfficePhone}">${mla.conOfficePhoneClean}</a>`
-        : "N/A";
+      // UPDATED: conOfficePhoneClean -> conOfficePhone, conOfficePhone -> conOfficePhoneRaw
+      const phoneHtml = mla.conOfficePhone
+        ? `📞 <a href="tel:${mla.conOfficePhoneRaw}">${mla.conOfficePhone}</a>`
+        : "";
 
-      // Same HTML block as lookup.js to ensure visual parity
       mlaOutput.innerHTML = `
         <div class="bcdl-district-header">Electoral District: ${districtName}</div>
         

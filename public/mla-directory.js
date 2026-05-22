@@ -26,7 +26,7 @@ function renderTable(items) {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = items
     .map((mla, index) => {
-      const partyLabel = mla.partyAbbreviationClean || "Independent";
+      const partyLabel = mla.partyAbbreviation || "Independent";
       const partyColor =
         PARTY_COLORS[partyLabel] || PARTY_COLORS["Independent"];
 
@@ -49,13 +49,13 @@ function renderTable(items) {
 
       // Constituency Office Layout
       let conAddressHtml = "";
-      if (mla.conOfficeAddressCleanSuite && mla.conOfficeAddressCleanStreet) {
-        conAddressHtml += `<p>${mla.conOfficeAddressCleanSuite}-${mla.conOfficeAddressCleanStreet}</p>`;
-      } else if (mla.conOfficeAddressCleanStreet) {
-        conAddressHtml += `<p>${mla.conOfficeAddressCleanStreet}</p>`;
+      if (mla.conOfficeSuite && mla.conOfficeStreet) {
+        conAddressHtml += `<p>${mla.conOfficeSuite}-${mla.conOfficeStreet}</p>`;
+      } else if (mla.conOfficeStreet) {
+        conAddressHtml += `<p>${mla.conOfficeStreet}</p>`;
       }
-      if (mla.conOfficeAddressCleanPOBox) {
-        conAddressHtml += `<p>${mla.conOfficeAddressCleanPOBox}</p>`;
+      if (mla.conOfficePOBox) {
+        conAddressHtml += `<p>${mla.conOfficePOBox}</p>`;
       }
       if (!conAddressHtml && !mla.conOfficeCity) {
         conAddressHtml = "<p>Address not listed</p>";
@@ -68,14 +68,14 @@ function renderTable(items) {
         ? `<p>${mla.conOfficePostalCode}</p>`
         : "";
 
-      const conPhoneHtml = mla.conOfficePhoneClean
-        ? `<p class="contact-number">📞 <a href="tel:${mla.conOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficePhoneClean}</a></p>`
+      const conPhoneHtml = mla.conOfficePhone
+        ? `<p class="contact-number">📞 <a href="tel:${mla.conOfficePhoneRaw}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficePhone}</a></p>`
         : "";
-      const conTollFreeHtml = mla.conOfficeTollFreeClean
-        ? `<p>📞 <a href="tel:${mla.conOfficeTollFree}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficeTollFreeClean}</a></p>`
+      const conTollFreeHtml = mla.conOfficeTollFree
+        ? `<p>📞 <a href="tel:${mla.conOfficeTollFreeRaw}" class="phone-link" onclick="event.stopPropagation()">${mla.conOfficeTollFree}</a></p>`
         : "";
-      const conFaxHtml = mla.conOfficeFaxClean
-        ? `<p>📠 ${mla.conOfficeFaxClean}</p>`
+      const conFaxHtml = mla.conOfficeFax
+        ? `<p>📠 ${mla.conOfficeFax}</p>`
         : "";
 
       // Legislature Office Layout
@@ -88,11 +88,11 @@ function renderTable(items) {
       const legPostal = mla.legBuildingPostalCode
         ? `<p>${mla.legBuildingPostalCode}</p>`
         : "";
-      const legPhoneHtml = mla.legOfficePhoneClean
-        ? `<p class="contact-number">📞 <a href="tel:${mla.legOfficePhone}" class="phone-link" onclick="event.stopPropagation()">${mla.legOfficePhoneClean}</a></p>`
+      const legPhoneHtml = mla.legOfficePhone
+        ? `<p class="contact-number">📞 <a href="tel:${mla.legOfficePhoneRaw}" class="phone-link" onclick="event.stopPropagation()">${mla.legOfficePhone}</a></p>`
         : "";
-      const legFaxHtml = mla.legOfficeFaxClean
-        ? `<p>📠 ${mla.legOfficeFaxClean}</p>`
+      const legFaxHtml = mla.legOfficeFax
+        ? `<p>📠 ${mla.legOfficeFax}</p>`
         : "";
 
       return `
@@ -244,9 +244,6 @@ function sortData(column, forceDirection = null) {
     if (column === "name") {
       valA = (a.lastName + a.firstName).toLowerCase();
       valB = (b.lastName + b.firstName).toLowerCase();
-    } else if (column === "partyAbbreviation") {
-      valA = a.partyAbbreviationClean || "";
-      valB = b.partyAbbreviationClean || "";
     } else {
       valA = a[column];
       valB = b[column];

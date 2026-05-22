@@ -45,7 +45,7 @@ lookupWidget.addEventListener("district-selected", (e) => {
   let mlaHtml = "";
   if (data.rawMlaData) {
     const mla = data.rawMlaData;
-    const partyLabel = mla.partyAbbreviationClean || "Independent";
+    const partyLabel = mla.partyAbbreviation || "Independent";
     const partyColor = PARTY_COLORS[partyLabel] || PARTY_COLORS["Independent"];
 
     const emailHtml = mla.ministryEmail
@@ -53,22 +53,18 @@ lookupWidget.addEventListener("district-selected", (e) => {
          <a href="mailto:${mla.email}">${mla.email}</a> <span style="color:#64748b; font-size:0.9em;"></span>`
       : `<a href="mailto:${mla.email}">${mla.email}</a>`;
 
-    const tollFreeHtml = mla.conOfficeTollFreeClean
-      ? `<br>📞 <a href="tel:${mla.conOfficeTollFree}">${mla.conOfficeTollFreeClean}</a> <span style="color:#64748b; font-size:0.9em;">(Toll Free)</span>`
+    const tollFreeHtml = mla.conOfficeTollFree
+      ? `<br>📞 <a href="tel:${mla.conOfficeTollFreeRaw}">${mla.conOfficeTollFree}</a> <span style="color:#64748b; font-size:0.9em;">(Toll Free)</span>`
       : "";
 
-    const suiteStr = mla.conOfficeAddressCleanSuite
-      ? `${mla.conOfficeAddressCleanSuite}-`
-      : "";
+    const suiteStr = mla.conOfficeSuite ? `${mla.conOfficeSuite}-` : "";
     const streetStr =
-      mla.conOfficeAddressCleanStreet ||
-      mla.conOfficeAddress ||
-      "Address not available";
+      mla.conOfficeStreet || mla.conOfficeAddressRaw || "Address not available";
     const formattedStreetLine = `${suiteStr}${streetStr}`;
 
-    const phoneHtml = mla.conOfficePhoneClean
-      ? `📞 <a href="tel:${mla.conOfficePhone}">${mla.conOfficePhoneClean}</a>`
-      : "N/A";
+    const phoneHtml = mla.conOfficePhone
+      ? `📞 <a href="tel:${mla.conOfficePhoneRaw}">${mla.conOfficePhone}</a>`
+      : "";
 
     mlaHtml = `
         <div class="bcdl-district-header">Electoral District: ${data.districtName}</div>
